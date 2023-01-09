@@ -154,7 +154,7 @@ class preloadGame extends Phaser.Scene {
     this.load.image("touch-slider", "assets/controls/touch-slider.png");
     this.load.image("touch-knob", "assets/controls/touch-knob.png");
     // this.load.json('level', 'assets/test8.json');
-    this.load.tilemapTiledJSON('level', 'assets/levels/nokiastuff.json')
+    this.load.tilemapTiledJSON('level', 'assets/levels/nokia1.json')
   }
   create() {
     this.scene.start("startGame");
