@@ -2,7 +2,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene, x, y, type) {
     super(scene, x, y, enemeyConfigs[type].key);
-
+    console.log(type)
     const anims = scene.anims;
     anims.create({
       key: "enemy-run",
@@ -21,6 +21,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(.5, .5);
     this.setCollideWorldBounds(true);
     this.setBounce(0)
+    if (this.type == 1) {
+      console.log(enemeyConfigs[this.type].key)
+      this.body.setAllowGravity(false)
+    }
     this.previousX = this.x;
     this.strength = enemeyConfigs[type].strength
 

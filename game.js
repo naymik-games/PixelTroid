@@ -133,7 +133,7 @@ class playGame extends Phaser.Scene {
     });
     pellets = this.physics.add.group({
       defaultKey: 'pellet',
-      defaultFrame: lavaBallFrame,
+      defaultFrame: 0,
       maxSize: 30,
       allowGravity: false,
       immovable: true
@@ -782,10 +782,13 @@ class playGame extends Phaser.Scene {
 
     enemies = this.physics.add.group({ immovable: true });
     for (var i = 0; i < this.thinglayer.length; i++) {
-      if (this.thinglayer[i].name == 'Enemy') {
-        var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
-        var en = Phaser.Math.Between(0, 7)
-        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), en)
+      var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
+      if (this.thinglayer[i].name == 'Enemy1') {
+        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 0)
+        console.log('make enemy 1')
+      } else if (this.thinglayer[i].name == 'Enemy2') {
+        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 1)
+        console.log('make enemy 2')
       }
     }
 

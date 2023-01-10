@@ -57,12 +57,12 @@ class UI extends Phaser.Scene {
 
 
 
-    this.aButton = this.add.image(game.config.width / 2, this.controlsY, "controller_buttons", 3).setScale(4).setInteractive();
+    this.aButton = this.add.image(game.config.width / 2 + 75, this.controlsY, "controller_buttons", 3).setScale(4).setInteractive();
     this.aButton.on('pointerdown', this.doA, this);
     this.aButton.on('pointerup', this.doADone, this);
 
 
-    this.bButton = this.add.image(game.config.width / 2 + 75, this.controlsY + 50, "controller_buttons", 2).setScale(4).setInteractive();
+    this.bButton = this.add.image(game.config.width / 2, this.controlsY + 50, "controller_buttons", 2).setScale(4).setInteractive();
     this.bButton.on('pointerdown', this.doB, this);
     this.bButton.on('pointerup', this.doBDone, this);
 
