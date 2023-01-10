@@ -82,6 +82,7 @@ let layer,
   powerupGroup,
   pellets,
   doors,
+  bombRadius,
   bulletSpeed = 250,
   shellSpeed = 200,
   wasStanding = false,
@@ -120,7 +121,7 @@ let playerRollBodyXOffset = 26
 
 let playerStandBodyY = 20
 let playerStandBodyYOffset = 12
-let playerRollBodyY = 15
-let playerRollBodyYOffset = 17
+let playerRollBodyY = 12
+let playerRollBodyYOffset = 20
 
 //power ups  invincible,            items roll

@@ -116,7 +116,7 @@ class playGame extends Phaser.Scene {
       allowGravity: false,
       immovable: true
     });
-
+    bombRadius = this.physics.add.group({ allowGravity: false, immovable: true });
     powerupGroup = this.physics.add.group({
       defaultKey: 'powerups',
       defaultFrame: 0,
@@ -188,8 +188,8 @@ class playGame extends Phaser.Scene {
     this.physics.add.collider(this.player.sprite, oneWayBlocks, null, this.checkOneWay, this);
     this.physics.add.collider(this.player.sprite, lavaBall, this.playerHitLavaBall, null, this);
 
-    this.physics.add.collider(this.player.sprite, spikes, this.playerHit, null, this);
-    this.physics.add.collider(this.player.sprite, sparks, this.playerHit, null, this);
+    this.physics.add.collider(this.player.sprite, spikes, this.hitObject, null, this);
+    this.physics.add.collider(this.player.sprite, sparks, this.hitObject, null, this);
 
     this.physics.world.addCollider(enemies, layer);
     this.physics.world.addCollider(enemies, enemies);
@@ -197,7 +197,12 @@ class playGame extends Phaser.Scene {
     this.physics.world.addCollider(enemies, oneWayBlocks);
     this.physics.world.addCollider(enemies, spikes);
     this.physics.world.addCollider(enemies, boxes);
+    this.physics.add.overlap(this.player.swordHitBox, enemies, this.swordHitEnemy, null, this);
+    this.physics.add.overlap(this.player.swordHitBox, boxes, this.swordHitBox, null, this);
     this.physics.add.overlap(this.player.sprite, enemies, this.hitEnemy, null, this);
+
+    this.physics.world.addCollider(bombRadius, boxes, this.bombHitBox, null, this);
+    this.physics.world.addCollider(bombRadius, enemies, this.bombHitEnemy, null, this);
 
     this.physics.world.addCollider(bullets, layer);
     this.physics.world.addCollider(bullets, boxes, this.bulletHitBox, null, this);
@@ -212,7 +217,7 @@ class playGame extends Phaser.Scene {
     this.physics.world.addCollider(this.player.sprite, pushableBlocks, this.pushBlock, null, this);
 
     this.physics.add.overlap(this.player.sprite, doors, this.hitDoor, null, this);
-    this.physics.add.overlap(this.player.sprite, beams, this.playerHit, null, this);
+    this.physics.add.overlap(this.player.sprite, beams, this.hitObject, null, this);
 
     this.physics.add.collider(powerupGroup, layer);
     this.physics.add.overlap(this.player.sprite, powerupGroup, this.collectObject, null, this);
@@ -452,45 +457,6 @@ class playGame extends Phaser.Scene {
 
 
 
-    //DO JUMP
-
-    //if player is standing, or just fallen off a ledge (within our allowed grace time) and..&& !jumping
-    //either up key is press, or touchjump flag is set AND they are not already jumping then jump! //if ((standing || time <= edgeTimer) && (cursors.up.isDown || touchJump)) {
-
-    /* if (cursors.up.isDown || touchJump || this.player.dpad.isY) {
-
-      this.player.roll = false
-      if ((standing || time <= edgeTimer) && !jumping) {
-        this.player.sprite.body.setVelocityY(-jumpVelocity);
-        jumping = true
-        this.canDoubleJump = true
-      } else {
-        if (this.canDoubleJump) {
-
-          // the hero can't double jump anymore
-          this.canDoubleJump = false;
-
-          // applying double jump force
-          this.player.sprite.body.setVelocityY(-jumpVelocity * 1.5);
-        }
-      }
-    } */
-
-    /* 
-        if ((standing || jumps > 0 || time <= edgeTimer) && (cursors.up.isDown || touchJump || this.player.dpad.isY)) {
-          this.player.roll = false
-          jumping = true;
-          if (jumping && jumps > 0) {
-            this.player.sprite.body.setVelocityY(-jumpVelocity);
-    
-            jumps--
-          }
-    
-    
-    
-        } */
-
-
 
     if ((standing || time <= edgeTimer || jumps > 0) && (cursors.up.isDown || touchJump || this.player.dpad.isY) && !jumping) {
       if (standing) {
@@ -533,6 +499,7 @@ class playGame extends Phaser.Scene {
       if (this.player.weapon == 'sword') {
         this.player.sprite.anims.play("player-attack", true).once('animationcomplete', function () {
           this.player.sprite.anims.stop();
+          this.player.swordHitBox.body.enable = false
           this.player.isAttack = false
         }, this)
       } else {
@@ -812,20 +779,16 @@ class playGame extends Phaser.Scene {
     }
   }
   createEnemies() {
-    this.anims.create({
-      key: "enemy-run",
-      frames: this.anims.generateFrameNumbers("enemy01", { start: 0, end: 2 }),
-      frameRate: 12,
-      repeat: -1
-    });
+
     enemies = this.physics.add.group({ immovable: true });
     for (var i = 0; i < this.thinglayer.length; i++) {
       if (this.thinglayer[i].name == 'Enemy') {
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
-        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2))
+        var en = Phaser.Math.Between(0, 7)
+        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), en)
       }
     }
-    console.log(enemies)
+
   }
   createQuestions(layer) {
     questions = this.physics.add.group({ allowGravity: false, immovable: true });
@@ -1023,84 +986,87 @@ class playGame extends Phaser.Scene {
   }
   hitEnemy(player, baddie) {
 
-    this.playerHit()
+    this.player.playerHit()
 
+  }
+  hitObject(player, object) {
+    this.player.playerHit()
   }
   playerHitLavaBall(player, ball) {
     lavaBall.killAndHide(ball)
     ball.setPosition(-50, -50)
-    this.playerHit(player, ball)
+    this.player.playerHit(player, ball)
   }
 
-  playerHit(player, spike) {
-
-    //if you are not already invulnerable
-    if (!this.player.invulnerable && !this.player.invincible) {
-      //set player as invulnerable
-      this.player.invulnerable = true;
-      //get the heart sprites from our arrays we set up earlier
-
-
-
-      //remove a heart from out count stored on the player object
-      this.player.health -= 10;
-      this.addScore()
-      //if hearts is 0 or less you're dead as you are out of lives
-      if (this.player.health <= 0) {
-        //remove physics from player
-        this.player.sprite.disableBody(false, false);
-        //and play death animation
-        var tween = this.tweens.add({
-          targets: this.player.sprite,
-          alpha: 0.3,
-          scaleX: 1.1,
-          scaleY: 1.1,
-          angle: 90,
-          x: this.player.sprite.x - 20,
-          y: this.player.sprite.y - 20,
-          ease: 'Linear',
-          duration: 1000,
-          onComplete: function () {
-            //restartGame(this);
-            this.scene.stop()
-            this.scene.stop('UI')
-            this.scene.start('startGame')
-          },
-          onCompleteScope: this
-        });
-      }
-      //otherwise you're not dead you've just lost a life so...
-      else {
-        //make the player stop in their tracks and jump up
-        this.player.sprite.body.velocity.x = 0;
-        this.player.sprite.body.velocity.y = -220;
-        //tween the players alpha to 30%
-        var tween = this.tweens.add({
-          targets: this.player.sprite,
-          alpha: 0.3,
-          ease: 'Linear',
-          duration: 200,
-          onCompleteScope: this
-        });
-
-        //set a timer for 1 second. When this is up we tween player back to normal and make then vulnerable again
-        var timer = this.time.delayedCall(1000, this.playerVulnerable, null, this);
-      }
-    }
-  }
-  playerVulnerable() {
-    //tween player back to 100% opacity and reset invulnerability flag
-    var death = this.tweens.add({
-      targets: this.player.sprite,
-      alpha: 1,
-      ease: 'Linear',
-      duration: 200,
-      onComplete: function () {
-        this.player.invulnerable = false;
-      },
-      onCompleteScope: this
-    });
-  }
+  /*  playerHit(player, spike) {
+ 
+     //if you are not already invulnerable
+     if (!this.player.invulnerable && !this.player.invincible) {
+       //set player as invulnerable
+       this.player.invulnerable = true;
+       //get the heart sprites from our arrays we set up earlier
+ 
+ 
+ 
+       //remove a heart from out count stored on the player object
+       this.player.health -= 10;
+       this.addScore()
+       //if hearts is 0 or less you're dead as you are out of lives
+       if (this.player.health <= 0) {
+         //remove physics from player
+         this.player.sprite.disableBody(false, false);
+         //and play death animation
+         var tween = this.tweens.add({
+           targets: this.player.sprite,
+           alpha: 0.3,
+           scaleX: 1.1,
+           scaleY: 1.1,
+           angle: 90,
+           x: this.player.sprite.x - 20,
+           y: this.player.sprite.y - 20,
+           ease: 'Linear',
+           duration: 1000,
+           onComplete: function () {
+             //restartGame(this);
+             this.scene.stop()
+             this.scene.stop('UI')
+             this.scene.start('startGame')
+           },
+           onCompleteScope: this
+         });
+       }
+       //otherwise you're not dead you've just lost a life so...
+       else {
+         //make the player stop in their tracks and jump up
+         this.player.sprite.body.velocity.x = 0;
+         this.player.sprite.body.velocity.y = -220;
+         //tween the players alpha to 30%
+         var tween = this.tweens.add({
+           targets: this.player.sprite,
+           alpha: 0.3,
+           ease: 'Linear',
+           duration: 200,
+           onCompleteScope: this
+         });
+ 
+         //set a timer for 1 second. When this is up we tween player back to normal and make then vulnerable again
+         var timer = this.time.delayedCall(1000, this.playerVulnerable, null, this);
+       }
+     }
+   }
+   playerVulnerable() {
+     //tween player back to 100% opacity and reset invulnerability flag
+     var death = this.tweens.add({
+       targets: this.player.sprite,
+       alpha: 1,
+       ease: 'Linear',
+       duration: 200,
+       onComplete: function () {
+         this.player.invulnerable = false;
+       },
+       onCompleteScope: this
+     });
+   } */
   hitQuestionMarkBlock(player, block) {
     //if the block has been hit from the bottom and is not already hit then...
     if (block.body.touching.down && !block.hit) {
@@ -1116,7 +1082,7 @@ class playGame extends Phaser.Scene {
       powerup.y = block.y;
       powerup.type = 'invincible'
       powerup.body.setVelocityY(-300);
-      powerup.body.setVelocityX(180)
+      powerup.body.setVelocityX(80)
       /*  if (Math.floor(Math.random() * 1) > .5) powerup.body.setVelocityX(-80);
        else powerup.body.setVelocityX(80); */
       powerup.body.setAllowGravity(true);
@@ -1159,6 +1125,52 @@ class playGame extends Phaser.Scene {
     powerup.setVelocityX(80)
     //randomly assign left or right direction to the powerup
 
+  }
+  swordHitEnemy(sword, bad) {
+    this.player.swordHitBox.body.enable = false
+    if (!bad.hit) {
+      // set baddie as being hit and remove physics
+      bad.hit = true
+      bad.disableBody(false, false);
+      //make player jump up in the air a little bit
+      this.explode(bad.x, bad.y)
+
+      //animate baddie, fading out and getting bigger
+      var tween = this.tweens.add({
+        targets: bad,
+        alpha: 0.3,
+        scaleX: 1.5,
+        scaleY: 1.5,
+        ease: 'Linear',
+        duration: 200,
+        onCompleteScope: this,
+        onComplete: function () {
+          //remove the game object
+          this.addPellet(bad.x, bad.y)
+          destroyGameObject(bad);
+
+        },
+      });
+    }
+  }
+  swordHitBox(bullet, box) {
+    this.player.swordHitBox.body.enable = false
+    this.explode(box.x, box.y)
+    //tween coin to score coin in corner shrink
+    var tween = this.tweens.add({
+      targets: box,
+      alpha: 0.3,
+      //angle: 720,
+      //x: scoreCoin.x,
+      //  y: '-=50',
+      //scaleX: 0.5,
+      // scaleY: 0.5,
+      ease: "Linear",
+      duration: 250,
+      onComplete: function () {
+        destroyGameObject(box);
+      }
+    }, this);
   }
   bulletHitEnemy(bullet, bad) {
     this.player.killBullet(bullet)
@@ -1203,6 +1215,51 @@ class playGame extends Phaser.Scene {
   removePellet(pellet) {
     pellet.setActive(false);
     pellet.setVisible(false);
+  }
+  bombHitBox(bombHit, box) {
+    this.explode(box.x, box.y)
+    //tween coin to score coin in corner shrink
+    var tween = this.tweens.add({
+      targets: box,
+      alpha: 0.3,
+      //angle: 720,
+      //x: scoreCoin.x,
+      //  y: '-=50',
+      //scaleX: 0.5,
+      // scaleY: 0.5,
+      ease: "Linear",
+      duration: 250,
+      onComplete: function () {
+        destroyGameObject(box);
+      }
+    }, this);
+  }
+  bombHitEnemy(bombHit, bad) {
+
+    if (!bad.hit) {
+      // set baddie as being hit and remove physics
+      bad.hit = true
+      bad.disableBody(false, false);
+      //make player jump up in the air a little bit
+      this.explode(bad.x, bad.y)
+
+      //animate baddie, fading out and getting bigger
+      var tween = this.tweens.add({
+        targets: bad,
+        alpha: 0.3,
+        scaleX: 1.5,
+        scaleY: 1.5,
+        ease: 'Linear',
+        duration: 200,
+        onCompleteScope: this,
+        onComplete: function () {
+          //remove the game object
+          this.addPellet(bad.x, bad.y)
+          destroyGameObject(bad);
+
+        },
+      });
+    }
   }
   bulletHitBox(bullet, box) {
     this.player.killBullet(bullet)

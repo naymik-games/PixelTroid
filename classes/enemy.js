@@ -1,8 +1,16 @@
 class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-  constructor(scene, x, y) {
-    super(scene, x, y, 'enemy01');
+  constructor(scene, x, y, type) {
+    super(scene, x, y, enemeyConfigs[type].key);
 
+    const anims = scene.anims;
+    anims.create({
+      key: "enemy-run",
+      frames: this.anims.generateFrameNumbers(enemeyConfigs[type].key, { start: 0, end: 2 }),
+      frameRate: enemeyConfigs[type].fr,
+      repeat: -1
+    });
+    this.type = type
     //this.play('thrust');
     var tiles = Phaser.Math.Between(7, 12)
     this.vx = Phaser.Math.Between(10, 35)
@@ -14,7 +22,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setCollideWorldBounds(true);
     this.setBounce(0)
     this.previousX = this.x;
-
+    this.strength = enemeyConfigs[type].strength
 
     this.maxDistance = maxDistance
     this.play('enemy-run')
@@ -67,3 +75,51 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.previousX = this.x;
   }
 }
+
+const enemeyConfigs = [{
+  strength: 0,
+  key: 'enemy01',
+  fr: 12
+},
+{
+  strength: 0,
+  key: 'enemy02',
+  fr: 3
+},
+
+{
+  strength: 0,
+  key: 'enemy03',
+  fr: 12
+},
+
+{
+  strength: 0,
+  key: 'enemy04',
+  fr: 12
+},
+
+{
+  strength: 0,
+  key: 'enemy05',
+  fr: 6
+},
+
+{
+  strength: 0,
+  key: 'enemy06',
+  fr: 6
+},
+
+{
+  strength: 0,
+  key: 'enemy07',
+  fr: 6
+},
+
+{
+  strength: 0,
+  key: 'enemy08',
+  fr: 6
+}
+]

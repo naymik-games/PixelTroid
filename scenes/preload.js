@@ -126,10 +126,40 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 22,
       frameHeight: 22
     });
-    this.load.spritesheet('enemy01', 'assets/sprites/enemy01.png', {
+    this.load.spritesheet('enemy01', 'assets/sprites/enemies/enemy01.png', {
       frameWidth: 16,
       frameHeight: 16
     });
+    this.load.spritesheet('enemy02', 'assets/sprites/enemies/enemy02.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+    this.load.spritesheet('enemy03', 'assets/sprites/enemies/enemy03.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+    this.load.spritesheet('enemy04', 'assets/sprites/enemies/enemy04.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+    this.load.spritesheet('enemy05', 'assets/sprites/enemies/enemy05.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+
+    this.load.spritesheet('enemy06', 'assets/sprites/enemies/enemy06.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+    this.load.spritesheet('enemy07', 'assets/sprites/enemies/enemy07.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+    this.load.spritesheet('enemy08', 'assets/sprites/enemies/enemy08.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
+
     this.load.spritesheet('powerups', 'assets/sprites/powerups.png', {
       frameWidth: 16,
       frameHeight: 16
@@ -154,7 +184,7 @@ class preloadGame extends Phaser.Scene {
     this.load.image("touch-slider", "assets/controls/touch-slider.png");
     this.load.image("touch-knob", "assets/controls/touch-knob.png");
     // this.load.json('level', 'assets/test8.json');
-    this.load.tilemapTiledJSON('level', 'assets/levels/nokia2.json')
+    this.load.tilemapTiledJSON('level', 'assets/levels/nokia3.json')
   }
   create() {
     this.scene.start("startGame");
