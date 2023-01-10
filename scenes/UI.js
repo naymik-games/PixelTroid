@@ -37,7 +37,7 @@ class UI extends Phaser.Scene {
     this.Main = this.scene.get('playGame');
     //this.score = 0;
     // this.scoreText = this.add.bitmapText(85, 100, 'topaz', this.score, 80).setOrigin(.5).setTint(0xcbf7ff).setAlpha(1);
-    this.controlsY = game.config.height - 50
+    this.controlsY = game.config.height - 100
     /*   var base = this.add.image(0, 0, 'controller_buttons', 0).setScale(2)
       var thumb = this.add.image(0, 0, 'controller_buttons', 1).setScale(2)
       this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
@@ -62,7 +62,7 @@ class UI extends Phaser.Scene {
     this.aButton.on('pointerup', this.doADone, this);
 
 
-    this.bButton = this.add.image(game.config.width / 2 + 75, this.controlsY, "controller_buttons", 2).setScale(4).setInteractive();
+    this.bButton = this.add.image(game.config.width / 2 + 75, this.controlsY + 50, "controller_buttons", 2).setScale(4).setInteractive();
     this.bButton.on('pointerdown', this.doB, this);
     this.bButton.on('pointerup', this.doBDone, this);
 
@@ -148,6 +148,7 @@ class UI extends Phaser.Scene {
     // this.main.game.events.emit(EVENTS_NAME.attack);
     // this.main.game.events.emit(EVENTS_NAME.smash);
   }
+
   joyStickState() {
     var cursorKeys = this.joyStick.createCursorKeys();
     console.log(cursorKeys.right.isDown)

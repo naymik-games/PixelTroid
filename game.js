@@ -69,9 +69,9 @@ class playGame extends Phaser.Scene {
     this.createSparks(layer)
     this.createBeams(layer)
     //sparks.playAnimation('layer-spark')
-    this.thinglayer = this.map.getObjectLayer('things')['objects'];
 
 
+    //anims
     this.anims.create({
       key: "rotate",
       frames: this.anims.generateFrameNumbers("coin", {
@@ -93,13 +93,14 @@ class playGame extends Phaser.Scene {
       repeat: -1
     });
 
-    const config1 = {
+    this.anims.create({
       key: 'effect-explode',
       frames: 'explode',
       frameRate: 20,
       repeat: 0
-    };
-    this.anims.create(config1);
+    });
+
+    //Groups
     this.bursts = this.add.group({
       defaultKey: 'explode',
       maxSize: 30
@@ -145,6 +146,9 @@ class playGame extends Phaser.Scene {
       immovable: true
     }); */
     //create from object layer
+
+    this.thinglayer = this.map.getObjectLayer('things')['objects'];
+
     this.createPlayer()
 
     this.createCoins()
@@ -152,18 +156,22 @@ class playGame extends Phaser.Scene {
     this.createShells()
     this.createHPlatforms()
     this.createEnemies()
-    // console.log(this.player.sprite.body)
+
+
+    //camera and cursors
 
     // console.log(this.anims)
     //  this.cameras.main.setBounds(0, 0, layer.x + layer.width, 0);
     //  this.cameras.main.setViewport(0, 0, 300);
     this.cameras.main.setZoom(2)
-    this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);// map.heightInPixels
+    this.cameras.main.setBounds(0, 0, this.map.widthInPixels, 850);// map.heightInPixels
     this.cameras.main.setViewport(0, 150, game.config.width, game.config.height - 300);
     this.cameras.main.setDeadzone(game.config.width / 4, game.config.height / 4);
 
     cursors = this.input.keyboard.createCursorKeys();
     this.keyObj = this.input.keyboard.addKey('X');  // Get key object
+
+    //Physics
 
     this.physics.world.addCollider(this.player.sprite, layer);
     this.physics.world.addCollider(this.player.sprite, boxes);
@@ -266,18 +274,18 @@ class playGame extends Phaser.Scene {
     //if either touch pointer is down. Two thumbs, two pointers
     if (this.input.pointer1.isDown || this.input.pointer2.isDown) {
       //work out half way point of our game
-      var leftHalf = game.config.width / 2;
-      var bottomHalf = game.config.height / 2
+      var leftHalf = game.config.width;
+      var bottomHalf = game.config.height - 125
       //Left hand side - horizontal movement
       //if thumb is on the left hand side of the screen we are dealing with horizontal movement
-      if ((this.input.pointer1.x < leftHalf || this.input.pointer2.x < leftHalf) && (this.input.pointer1.y > bottomHalf || this.input.pointer2.y > bottomHalf)) {
+      if ((this.input.pointer1.x < leftHalf || this.input.pointer2.x < leftHalf) && (this.input.pointer1.y < bottomHalf || this.input.pointer2.y < bottomHalf)) {
         //reset pointer variable
         var myMovePointer = null;
         //here we get the pointer that is being used on the left hand side of screen. Depends which thumb they touched screen with first.
-        if (this.input.pointer1.x < leftHalf && this.input.pointer1.isDown) {
+        if ((this.input.pointer1.x < leftHalf && this.input.pointer1.y < bottomHalf) && this.input.pointer1.isDown) {
           myMovePointer = this.input.pointer1;
         }
-        if (this.input.pointer2.x < leftHalf && this.input.pointer2.isDown) {
+        if ((this.input.pointer2.x < leftHalf && this.input.pointer2.y < bottomHalf) && this.input.pointer2.isDown) {
           myMovePointer = this.input.pointer2;
         }
 
@@ -288,9 +296,9 @@ class playGame extends Phaser.Scene {
             //make it visible
             touchSlider.alpha = 1;
             //position touchSlider to be where the users thumb or finger is
-            touchSlider.x = myMovePointer.x;
+            //touchSlider.x = myMovePointer.worldX;
             //with the Y pos we add a thumbSizeOffset so it's above the users thumb not hidden under it
-            touchSlider.y = myMovePointer.y - thumbSizeOffset;
+            //touchSlider.y = myMovePointer.y - thumbSizeOffset;
             //set our start point and reset slider display
             startX = myMovePointer.x;
             sliderKnob.x = 0;
@@ -361,7 +369,7 @@ class playGame extends Phaser.Scene {
 
       //Right hand side - Touch Jumping
       //if thumb is on the right hand side of the screen we are dealing with vertical movement - i.e. jumping.
-      if ((this.input.pointer1.x > leftHalf || this.input.pointer2.x > leftHalf) && (this.input.pointer1.y > bottomHalf || this.input.pointer2.y > bottomHalf) && (this.input.pointer1.y < 150 || this.input.pointer2.y < 150)) {
+      /* if ((this.input.pointer1.x > leftHalf || this.input.pointer2.x > leftHalf) && (this.input.pointer1.y > bottomHalf || this.input.pointer2.y > bottomHalf) && (this.input.pointer1.y < 150 || this.input.pointer2.y < 150)) {
         //reset pointer variable
         var myJumpPointer = null;
 
@@ -408,13 +416,13 @@ class playGame extends Phaser.Scene {
           }
           startY = 0
         }
-      }
+      } */
       //neither thumb is down so reset touch movement variables and hide touchSlider
     } else {
       touchSlider.alpha = 0;
       startX = 0;
       touchMoving = false;
-      jumps = 2
+      //jumps = 2
 
     }
     //VELOCITY CHECK
@@ -485,11 +493,20 @@ class playGame extends Phaser.Scene {
 
 
     if ((standing || time <= edgeTimer || jumps > 0) && (cursors.up.isDown || touchJump || this.player.dpad.isY) && !jumping) {
-      jumping = true;
-      this.player.roll = false
-      this.player.sprite.body.setVelocityY(-jumpVelocity);
+      if (standing) {
+        jumping = true;
+        this.player.roll = false
+        this.player.sprite.body.setVelocityY(-jumpVelocity);
+        this.player.dpad.isY = false
+        jumps--
+      } else if (jumps > 0 || this.player.dpad.isY) {
+        this.player.sprite.body.setVelocityY(-jumpVelocity);
 
-      jumps--
+        jumps--
+      } else {
+        //jumping = false;
+      }
+
 
     }
 
@@ -503,7 +520,7 @@ class playGame extends Phaser.Scene {
         jumping = false;
         touchJump = false;
         prevPos = 0;
-        jumps = 2
+        jumps = 1
       }
 
     }
@@ -965,13 +982,13 @@ class playGame extends Phaser.Scene {
     bomb.body.velocity.y = 100;
   }
   buildTouchSlider() {
-    sliderBar = this.add.sprite(0, 0, 'touch-slider').setScale(.5);
-    sliderKnob = this.add.sprite(0, 0, 'touch-knob').setScale(.5);
+    sliderBar = this.add.sprite(0, 0, 'touch-slider').setScale(1);
+    sliderKnob = this.add.sprite(0, 0, 'touch-knob').setScale(1);
 
-    touchSlider = this.add.container(300, 150).setScrollFactor(0);
+    touchSlider = this.add.container(300, 225).setScrollFactor(0);
     touchSlider.add(sliderBar);
     touchSlider.add(sliderKnob);
-    touchSlider.alpha = 0;
+    touchSlider.alpha = 1;
   }
   ////////////////////////////////////////////////////
   // ACTIONS
