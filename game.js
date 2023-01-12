@@ -44,18 +44,19 @@ class playGame extends Phaser.Scene {
   }
   create() {
 
-    this.cameras.main.setBackgroundColor(0xC6EFD8);
-    // this.cameras.main.setBackgroundColor(0x000000);
+    // this.cameras.main.setBackgroundColor(0xC6EFD8);
+    this.cameras.main.setBackgroundColor(rooms[0].background);
     //this.cameras.main.setBackgroundColor(0xAFB0B3);
 
     this.map = this.make.tilemap({ key: "level" });
-    this.tiles = this.map.addTilesetImage('nokia_tiles', 'tiles');
+    this.tiles = this.map.addTilesetImage(rooms[currentRoom].tileFile, rooms[currentRoom].tileKey);
 
     layer = this.map.createLayer('layer0', this.tiles);
+
     const layerDec = this.map.createLayer('layer1', this.tiles);
 
     // const layer2 = map2.createLayer(0, tiles, 0, 0);
-    layer.setCollisionByExclusion([-1, questionFrame, collapseFrame, oneWayFrame, spikeFrame, boxFrame, pushableFrame, sparkFrame, beamFrame]);
+    layer.setCollisionByExclusion([-1, questionFrame, collapseFrame, oneWayFrame, spikeFrame, boxFrame, pushableFrame, sparkFrame, beamFrame, reappearFrame, lavaFrame]);
     //create from other layers
     this.createQuestions(layer)
     this.createCollapse(layer)
@@ -68,6 +69,8 @@ class playGame extends Phaser.Scene {
     this.createDoors(layerDec)
     this.createSparks(layer)
     this.createBeams(layer)
+    this.createReappearingBlocks(layer)
+    this.createLava(layer)
     //sparks.playAnimation('layer-spark')
 
 
@@ -138,6 +141,7 @@ class playGame extends Phaser.Scene {
       allowGravity: false,
       immovable: true
     });
+
     /* lavaLaunchers = this.physics.add.group({
       defaultKey: 'bullet',
       defaultFrame: lavaLauncherFrame,
@@ -172,56 +176,66 @@ class playGame extends Phaser.Scene {
     this.keyObj = this.input.keyboard.addKey('X');  // Get key object
 
     //Physics
-
+    //player collide
     this.physics.world.addCollider(this.player.sprite, layer);
     this.physics.world.addCollider(this.player.sprite, boxes);
+    this.physics.add.collider(this.player.sprite, hPlatforms);
+    this.physics.world.addCollider(this.player.sprite, reappearingBlocks);
+    //player collect
+    this.physics.add.overlap(this.player.sprite, coins, this.collectObject, null, this);
+    this.physics.add.overlap(this.player.sprite, keys, this.collectObject, null, this);
+    this.physics.add.overlap(this.player.sprite, pellets, this.collectObject, null, this);
+    this.physics.add.overlap(this.player.sprite, powerupGroup, this.collectObject, null, this);
+    //player collide with action
+    this.physics.add.collider(this.player.sprite, shells, this.shellHit, null, this);
+    this.physics.add.collider(this.player.sprite, questions, this.hitQuestionMarkBlock, null, this);
+    this.physics.add.collider(this.player.sprite, collapsingPlatforms, this.shakePlatform, this.checkOneWay, this);
+    this.physics.add.collider(this.player.sprite, oneWayBlocks, null, this.checkOneWay, this);
+    this.physics.add.collider(this.player.sprite, doors, this.hitDoor, null, this);
+    this.physics.world.addCollider(this.player.sprite, pushableBlocks, this.pushBlock, null, this);
+    //player collide with damage    
+    this.physics.add.collider(this.player.sprite, spikes, this.hitObject, null, this);
+    this.physics.add.overlap(this.player.sprite, lava, this.hitObject, null, this);
+    this.physics.add.collider(this.player.sprite, sparks, this.hitObject, null, this);
+    this.physics.add.collider(this.player.sprite, lavaBall, this.playerHitLavaBall, null, this);
+    this.physics.add.overlap(this.player.sprite, enemies, this.hitEnemy, null, this);
+    this.physics.add.overlap(this.player.sprite, beams, this.hitObject, null, this);
+    //player weapons
+    this.physics.add.overlap(this.player.swordHitBox, enemies, this.swordHitEnemy, null, this);
+    this.physics.add.overlap(this.player.swordHitBox, boxes, this.swordHitBox, null, this);
+    this.physics.add.overlap(this.player.swordHitBox, reappearingBlocks, this.bombHitReappear, null, this);
+
+    this.physics.world.addCollider(bombRadius, boxes, this.bombHitBox, null, this);
+    this.physics.world.addCollider(bombRadius, enemies, this.bombHitEnemy, null, this);
+    this.physics.world.addCollider(bombRadius, reappearingBlocks, this.bombHitReappear, null, this);
+
+    this.physics.world.addCollider(bullets, layer);
+    this.physics.world.addCollider(bullets, boxes, this.bulletHitBox, null, this);
+    this.physics.world.addCollider(bullets, reappearingBlocks, this.bulletHitReappear, null, this);
+    this.physics.world.addCollider(bullets, enemies, this.bulletHitEnemy, null, this);
+    //object collide
     this.physics.world.addCollider(shells, layer);
     this.physics.world.addCollider(boxes, layer);
     this.physics.world.addCollider(boxes, boxes);
     this.physics.world.addCollider(boxes, shells);
     this.physics.world.addCollider(spikes, shells);
-    this.physics.add.overlap(this.player.sprite, coins, this.collectObject, null, this);
-    this.physics.add.overlap(this.player.sprite, keys, this.collectObject, null, this);
-    this.physics.add.collider(this.player.sprite, shells, this.shellHit, null, this);
-    this.physics.add.collider(this.player.sprite, questions, this.hitQuestionMarkBlock, null, this);
-    this.physics.add.collider(this.player.sprite, collapsingPlatforms, this.shakePlatform, this.checkOneWay, this);
-    this.physics.add.collider(this.player.sprite, oneWayBlocks, null, this.checkOneWay, this);
-    this.physics.add.collider(this.player.sprite, lavaBall, this.playerHitLavaBall, null, this);
-
-    this.physics.add.collider(this.player.sprite, spikes, this.hitObject, null, this);
-    this.physics.add.collider(this.player.sprite, sparks, this.hitObject, null, this);
-
     this.physics.world.addCollider(enemies, layer);
+    this.physics.add.collider(hPlatforms, layer);
+    this.physics.add.collider(powerupGroup, layer);
+    //object collide with action
+    this.physics.world.addCollider(pushableBlocks, pushableBlocks);
+    this.physics.world.addCollider(lavaBall, layer, this.lavaHitLayer, null, this);
+    this.physics.world.addCollider(pushableBlocks, layer, this.blockHitWall, null, this);
+    //enemy collide
     this.physics.world.addCollider(enemies, enemies);
     this.physics.world.addCollider(enemies, collapsingPlatforms);
     this.physics.world.addCollider(enemies, oneWayBlocks);
     this.physics.world.addCollider(enemies, spikes);
+    this.physics.world.addCollider(enemies, lava);
     this.physics.world.addCollider(enemies, boxes);
-    this.physics.add.overlap(this.player.swordHitBox, enemies, this.swordHitEnemy, null, this);
-    this.physics.add.overlap(this.player.swordHitBox, boxes, this.swordHitBox, null, this);
-    this.physics.add.overlap(this.player.sprite, enemies, this.hitEnemy, null, this);
 
-    this.physics.world.addCollider(bombRadius, boxes, this.bombHitBox, null, this);
-    this.physics.world.addCollider(bombRadius, enemies, this.bombHitEnemy, null, this);
 
-    this.physics.world.addCollider(bullets, layer);
-    this.physics.world.addCollider(bullets, boxes, this.bulletHitBox, null, this);
-    this.physics.world.addCollider(lavaBall, layer, this.lavaHitLayer, null, this);
-    this.physics.world.addCollider(bullets, enemies, this.bulletHitEnemy, null, this);
 
-    this.physics.add.collider(hPlatforms, layer);
-    this.physics.add.collider(this.player.sprite, hPlatforms);
-
-    this.physics.world.addCollider(pushableBlocks, layer, this.blockHitWall, null, this);
-    this.physics.world.addCollider(pushableBlocks, pushableBlocks);
-    this.physics.world.addCollider(this.player.sprite, pushableBlocks, this.pushBlock, null, this);
-
-    this.physics.add.overlap(this.player.sprite, doors, this.hitDoor, null, this);
-    this.physics.add.overlap(this.player.sprite, beams, this.hitObject, null, this);
-
-    this.physics.add.collider(powerupGroup, layer);
-    this.physics.add.overlap(this.player.sprite, powerupGroup, this.collectObject, null, this);
-    this.physics.add.overlap(this.player.sprite, pellets, this.collectObject, null, this);
     this.input.addPointer(1);
     this.buildTouchSlider();
     this.canDoubleJump = false
@@ -515,6 +529,9 @@ class playGame extends Phaser.Scene {
         if (this.player.roll) {
           this.player.sprite.anims.play("player-roll", true);
           this.player.sprite.body.setSize(playerRollBodyX, playerRollBodyY).setOffset(playerRollBodyXOffset, playerRollBodyYOffset)
+        } else if (this.player.sprite.body.velocity.y < 0) {
+          this.player.sprite.anims.play("player-jump", true);
+          this.player.sprite.body.setSize(playerStandBodyX, playerStandBodyY).setOffset(playerStandBodyXOffset, playerStandBodyYOffset)
         } else {
           this.player.sprite.anims.play("player-run", true);
           this.player.sprite.body.setSize(playerStandBodyX, playerStandBodyY).setOffset(playerStandBodyXOffset, playerStandBodyYOffset)
@@ -707,7 +724,329 @@ class playGame extends Phaser.Scene {
     score += 10;
     scoreText.setText(score); */
   }
+  ////////////////////////////////////////////////////
+  // WEAPON STUFF
+  ////////////////////////////////////////////////////
+  swordHitBox(bullet, box) {
+    this.player.swordHitBox.body.enable = false
+    this.explode(box.x, box.y)
+    //tween coin to score coin in corner shrink
+    var tween = this.tweens.add({
+      targets: box,
+      alpha: 0.3,
+      //angle: 720,
+      //x: scoreCoin.x,
+      //  y: '-=50',
+      //scaleX: 0.5,
+      // scaleY: 0.5,
+      ease: "Linear",
+      duration: 250,
+      onComplete: function () {
+        destroyGameObject(box);
+      }
+    }, this);
+  }
+  swordHitEnemy(sword, bad) {
+    this.player.swordHitBox.body.enable = false
+    if (!bad.hit) {
+      // set baddie as being hit and remove physics
+      bad.hit = true
+      bad.enemyHit(1)
+    }
+  }
+  bulletHitEnemy(bullet, bad) {
+    this.player.killBullet(bullet)
+    if (!bad.hit) {
+      // set baddie as being hit and remove physics
+      bad.hit = true
+      bad.enemyHit(1)
+    }
+  }
+  bombHitEnemy(bombHit, bad) {
 
+    if (!bad.hit) {
+      // set baddie as being hit and remove physics
+      bad.hit = true
+      bad.enemyHit(1)
+    }
+  }
+
+  bombHitBox(bombHit, box) {
+    this.explode(box.x, box.y)
+    //tween coin to score coin in corner shrink
+    var tween = this.tweens.add({
+      targets: box,
+      alpha: 0.3,
+      //angle: 720,
+      //x: scoreCoin.x,
+      //  y: '-=50',
+      //scaleX: 0.5,
+      // scaleY: 0.5,
+      ease: "Linear",
+      duration: 250,
+      onComplete: function () {
+        destroyGameObject(box);
+      }
+    }, this);
+  }
+
+  bombHitReappear(bombHit, block) {
+
+    //tween coin to score coin in corner shrink
+    var tween = this.tweens.add({
+      targets: block,
+      alpha: 0.2,
+      //angle: 720,
+      //x: scoreCoin.x,
+      //  y: '-=50',
+      //scaleX: 0.5,
+      // scaleY: 0.5,
+      ease: "Linear",
+      duration: 250,
+      onComplete: function () {
+        block.body.enable = false
+      }
+    }, this);
+    var timer = this.time.delayedCall(2000, this.reappearBlock, [block], this);
+  }
+  bulletHitReappear(bullet, block) {
+    this.player.killBullet(bullet)
+    var tween = this.tweens.add({
+      targets: block,
+      alpha: 0.2,
+      //angle: 720,
+      //x: scoreCoin.x,
+      //  y: '-=50',
+      //scaleX: 0.5,
+      // scaleY: 0.5,
+      ease: "Linear",
+      duration: 250,
+      onComplete: function () {
+        block.body.enable = false
+      }
+    }, this);
+    var timer = this.time.delayedCall(2000, this.reappearBlock, [block], this);
+  }
+  reappearBlock(block) {
+    var tween = this.tweens.add({
+      targets: block,
+      alpha: 1,
+      //angle: 720,
+      //x: scoreCoin.x,
+      //  y: '-=50',
+      //scaleX: 0.5,
+      // scaleY: 0.5,
+      ease: "Linear",
+      duration: 250,
+      onCompleteScope: this,
+      onComplete: function () {
+        block.body.enable = true
+
+      }
+    }, this);
+  }
+  bulletHitBox(bullet, box) {
+    this.player.killBullet(bullet)
+    this.explode(box.x, box.y)
+    //tween coin to score coin in corner shrink
+    var tween = this.tweens.add({
+      targets: box,
+      alpha: 0.3,
+      //angle: 720,
+      //x: scoreCoin.x,
+      //  y: '-=50',
+      //scaleX: 0.5,
+      // scaleY: 0.5,
+      ease: "Linear",
+      duration: 250,
+      onComplete: function () {
+        destroyGameObject(box);
+      }
+    }, this);
+  }
+  ////////////////////////////////////////////////////
+  // ACTIONS
+  ////////////////////////////////////////////////////
+  pushBlock(player, block) {
+    //block.body.setMaxVelocityX(25);
+  }
+  blockHitWall(block, layer) {
+    if (block.body.blocked.right || block.body.blocked.right) {
+      block.body.setImmovable(true)
+    }
+  }
+  hitDoor(player, door) {
+    //console.log(door)
+
+    if (this.player.hasKey) {
+      player.disableBody(false, false);
+      //door.disableBody(false, false);
+      this.input.enabled = false
+      if (door.direction == 'right') {
+        console.log('going right')
+        door.anims.play('effect-door-right', true).once('animationcomplete', function () {
+          this.scene.stop()
+          this.scene.stop('UI')
+          this.scene.start('startGame')
+        }, this);
+      } else {
+        door.anims.play('effect-door-left', true).once('animationcomplete', function () {
+          console.log('going left')
+          this.scene.stop()
+          this.scene.stop('UI')
+          this.scene.start('startGame')
+        }, this);
+      }
+
+      /* var t = this.tweens.add({
+        targets: player,
+        alpha: .2,
+        duration: 1000,
+        onCompleteScope: this,
+        onComplete: function () {
+          this.scene.stop()
+          this.scene.stop('UI')
+          this.scene.start('startGame')
+        }
+      }) */
+    }
+
+  }
+  hitEnemy(player, baddie) {
+
+    this.player.playerHit()
+
+  }
+  hitObject(player, object) {
+    this.player.playerHit()
+  }
+  playerHitLavaBall(player, ball) {
+    lavaBall.killAndHide(ball)
+    ball.setPosition(-50, -50)
+    this.player.playerHit(player, ball)
+  }
+
+
+  hitQuestionMarkBlock(player, block) {
+    //if the block has been hit from the bottom and is not already hit then...
+    if (block.body.touching.down && !block.hit) {
+      //mark block as hit
+      block.hit = true;
+      var powerup = powerupGroup.get().setActive(true);
+      powerup.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
+      powerup.enableBody = true;
+      powerup.x = block.x;
+      powerup.y = block.y;
+      powerup.type = 'invincible'
+      powerup.body.setVelocityY(-300);
+      powerup.body.setVelocityX(80)
+      /*  if (Math.floor(Math.random() * 1) > .5) powerup.body.setVelocityX(-80);
+       else powerup.body.setVelocityX(80); */
+      powerup.body.setAllowGravity(true);
+
+      //this.emptyQuestionBlock(powerup)
+
+
+      // powerup.enableBody = true;
+      //animate the rising of the mushroom powerup
+      /* var tween = this.tweens.add({
+        targets: powerup,
+        y: "-=24",
+        ease: 'Linear',
+        duration: 300,
+        onCompleteScope: this,
+        onComplete: function () {
+          // powerup.enableBody = true;
+          //when the animation completes call this function
+          //this.emptyQuestionBlock(block, powerup);
+
+        },
+      }); */
+
+      //animate the box being hit and jumping up slightly
+      var tween = this.tweens.add({
+        targets: block,
+        y: "-=5",
+        ease: 'Linear',
+        yoyo: true,
+        duration: 100
+      });
+    }
+  }
+  emptyQuestionBlock(block, powerup) {
+    //change the sprite of the question mark box
+    // block.setTexture("empty-box");
+    //enable physics on the mushroom powerup
+    // powerup.enableBody = true;
+    //turn mushroom powerups gravity back on
+    powerup.setVelocityX(80)
+    //randomly assign left or right direction to the powerup
+
+  }
+
+
+  lavaHitLayer(ball, layer) {
+    lavaBall.killAndHide(ball)
+    ball.setPosition(-50, -50)
+  }
+  shakePlatform(player, platform) {
+    //only make platform shake if player is standing on it
+    //console.log('shake')
+    if (player.body.blocked.down || player.body.touching.down) {
+      //do a little camera shake to indicate something bad is going to happen
+      this.cameras.main.shake(5, 0.001);
+      //we need to store the global scope here so we can keep it later
+      var ourScene = this;
+      //do a yoyo tween shaking the platform back and forth and up and down
+      var tween = this.tweens.add({
+        targets: platform,
+        yoyo: true,
+        repeat: 10,
+        x: {
+          from: platform.x,
+          to: platform.x + 2 * 1,
+        },
+        ease: 'Linear',
+        duration: 50,
+        onCompleteScope: this,
+        onComplete: function () {
+          this.destroyPlatform(platform);
+        }
+      });
+    }
+  }
+  destroyPlatform(platform) {
+    var tween = this.tweens.add({
+      targets: platform,
+      alpha: 0,
+      y: "+=25",
+      ease: 'Linear',
+      duration: 100,
+      onComplete: function () {
+        destroyGameObject(platform);
+      }
+    });
+  }
+  //////////////////////////////////////////
+  // REWARDS
+  //////////////////////////////////////////
+  addPellet(x, y) {
+    var pellet = pellets.get().setActive(true);
+
+
+    // Place the explosion on the screen, and play the animation.
+    pellet.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
+    pellet.setSize(8, 8).setOffset(8, 4)
+    pellet.type = 'pellet'
+    pellet.x = x;
+    pellet.y = y;
+    var timer = this.time.delayedCall(3000, this.removePellet, [pellet], this);
+    //bullet.play('bullet-fired')
+  }
+  removePellet(pellet) {
+    pellet.setActive(false);
+    pellet.setVisible(false);
+  }
   ///////////////////////////////////////////
   // CREATE FUNCTIONS
   ///////////////////////////////////////////
@@ -785,13 +1124,20 @@ class playGame extends Phaser.Scene {
       var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
       if (this.thinglayer[i].name == 'Enemy1') {
         var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 0)
-        console.log('make enemy 1')
+        //console.log('make enemy 1')
       } else if (this.thinglayer[i].name == 'Enemy2') {
         var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 1)
-        console.log('make enemy 2')
+        // console.log('make enemy 2')
+      }
+      else if (this.thinglayer[i].name == 'Enemy9') {
+        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 8)
+        // console.log('make enemy 2')
+      } else if (this.thinglayer[i].name == 'Enemy4') {
+        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 3)
+        // console.log('make enemy 2')
       }
     }
-
+    console.log(enemies)
   }
   createQuestions(layer) {
     questions = this.physics.add.group({ allowGravity: false, immovable: true });
@@ -809,6 +1155,15 @@ class playGame extends Phaser.Scene {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].y += (this.map.tileHeight / 2)
       collapsingPlatforms.add(sprites[i])
+    }
+  }
+  createReappearingBlocks(layer) {
+    reappearingBlocks = this.physics.add.group({ allowGravity: false, immovable: true });
+    var sprites = this.map.createFromTiles(reappearFrame, 0, { key: 'tiles', frame: reappearFrame }, null, null, layer)
+    for (var i = 0; i < sprites.length; i++) {
+      sprites[i].x += (this.map.tileWidth / 2)
+      sprites[i].y += (this.map.tileHeight / 2)
+      reappearingBlocks.add(sprites[i])
     }
   }
   createOneWay(layer) {
@@ -829,10 +1184,19 @@ class playGame extends Phaser.Scene {
       spikes.add(sprites[i])
     }
   }
+  createLava(layer) {
+    lava = this.physics.add.group({ allowGravity: false, immovable: true });
+    var sprites = this.map.createFromTiles(lavaFrame, 0, { key: 'tiles', frame: lavaFrame }, null, null, layer)
+    for (var i = 0; i < sprites.length; i++) {
+      sprites[i].x += (this.map.tileWidth / 2)
+      sprites[i].y += (this.map.tileHeight / 2)
+      lava.add(sprites[i])
+    }
+  }
   createSparks(layer) {
     this.anims.create({
       key: "layer-spark",
-      frames: this.anims.generateFrameNumbers("tiles", { start: 97, end: 99 }),
+      frames: this.anims.generateFrameNumbers("tiles", { start: 21, end: 23 }),
       frameRate: 12,
       repeat: -1
     });
@@ -854,7 +1218,7 @@ class playGame extends Phaser.Scene {
   createBeams(layer) {
     this.anims.create({
       key: "layer-beam",
-      frames: this.anims.generateFrameNumbers("tiles", { start: 100, end: 102 }),
+      frames: this.anims.generateFrameNumbers("tiles", { start: 16, end: 17 }),
       frameRate: 8,
       repeat: -1
     });
@@ -874,11 +1238,31 @@ class playGame extends Phaser.Scene {
     });
   }
   createDoors(layer) {
+    this.anims.create({
+      key: 'effect-door-right',
+      frames: this.anims.generateFrameNumbers("door", { start: 0, end: 3 }),
+      frameRate: 14,
+      repeat: 0
+    });
     doors = this.physics.add.group({ allowGravity: false, immovable: true });
-    var sprites = this.map.createFromTiles(doorFrame, 0, { key: 'tiles', frame: doorFrame }, null, null, layer)
+    var sprites = this.map.createFromTiles(doorRFrame, 0, { key: 'door', frame: 0 }, null, null, layer)
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
-      sprites[i].y += (this.map.tileHeight / 2)
+      sprites[i].direction = 'right'
+      //  sprites[i].y += (this.map.tileHeight / 2)
+      doors.add(sprites[i])
+    }
+    this.anims.create({
+      key: 'effect-door-left',
+      frames: this.anims.generateFrameNumbers("door", { start: 4, end: 7 }),
+      frameRate: 14,
+      repeat: 0
+    });
+    var sprites = this.map.createFromTiles(doorLFrame, 0, { key: 'door', frame: 4 }, null, null, layer)
+    for (var i = 0; i < sprites.length; i++) {
+      sprites[i].x += (this.map.tileWidth / 2)
+      sprites[i].direction = 'left'
+      //  sprites[i].y += (this.map.tileHeight / 2)
       doors.add(sprites[i])
     }
   }
@@ -956,376 +1340,6 @@ class playGame extends Phaser.Scene {
     touchSlider.add(sliderKnob);
     touchSlider.alpha = 1;
   }
-  ////////////////////////////////////////////////////
-  // ACTIONS
-  ////////////////////////////////////////////////////
-  pushBlock(player, block) {
-    //block.body.setMaxVelocityX(25);
-  }
-  blockHitWall(block, layer) {
-    if (block.body.blocked.right || block.body.blocked.right) {
-      block.body.setImmovable(true)
-    }
-  }
-  hitDoor(player, door) {
-    //console.log(door)
-    if (this.player.hasKey) {
-      player.disableBody(false, false);
-      //door.disableBody(false, false);
-      this.input.enabled = false
-      var t = this.tweens.add({
-        targets: player,
-        alpha: .2,
-        duration: 1000,
-        onCompleteScope: this,
-        onComplete: function () {
-          this.scene.stop()
-          this.scene.stop('UI')
-          this.scene.start('startGame')
-        }
-      })
-    }
-
-  }
-  hitEnemy(player, baddie) {
-
-    this.player.playerHit()
-
-  }
-  hitObject(player, object) {
-    this.player.playerHit()
-  }
-  playerHitLavaBall(player, ball) {
-    lavaBall.killAndHide(ball)
-    ball.setPosition(-50, -50)
-    this.player.playerHit(player, ball)
-  }
-
-  /*  playerHit(player, spike) {
- 
-     //if you are not already invulnerable
-     if (!this.player.invulnerable && !this.player.invincible) {
-       //set player as invulnerable
-       this.player.invulnerable = true;
-       //get the heart sprites from our arrays we set up earlier
- 
- 
- 
-       //remove a heart from out count stored on the player object
-       this.player.health -= 10;
-       this.addScore()
-       //if hearts is 0 or less you're dead as you are out of lives
-       if (this.player.health <= 0) {
-         //remove physics from player
-         this.player.sprite.disableBody(false, false);
-         //and play death animation
-         var tween = this.tweens.add({
-           targets: this.player.sprite,
-           alpha: 0.3,
-           scaleX: 1.1,
-           scaleY: 1.1,
-           angle: 90,
-           x: this.player.sprite.x - 20,
-           y: this.player.sprite.y - 20,
-           ease: 'Linear',
-           duration: 1000,
-           onComplete: function () {
-             //restartGame(this);
-             this.scene.stop()
-             this.scene.stop('UI')
-             this.scene.start('startGame')
-           },
-           onCompleteScope: this
-         });
-       }
-       //otherwise you're not dead you've just lost a life so...
-       else {
-         //make the player stop in their tracks and jump up
-         this.player.sprite.body.velocity.x = 0;
-         this.player.sprite.body.velocity.y = -220;
-         //tween the players alpha to 30%
-         var tween = this.tweens.add({
-           targets: this.player.sprite,
-           alpha: 0.3,
-           ease: 'Linear',
-           duration: 200,
-           onCompleteScope: this
-         });
- 
-         //set a timer for 1 second. When this is up we tween player back to normal and make then vulnerable again
-         var timer = this.time.delayedCall(1000, this.playerVulnerable, null, this);
-       }
-     }
-   }
-   playerVulnerable() {
-     //tween player back to 100% opacity and reset invulnerability flag
-     var death = this.tweens.add({
-       targets: this.player.sprite,
-       alpha: 1,
-       ease: 'Linear',
-       duration: 200,
-       onComplete: function () {
-         this.player.invulnerable = false;
-       },
-       onCompleteScope: this
-     });
-   } */
-  hitQuestionMarkBlock(player, block) {
-    //if the block has been hit from the bottom and is not already hit then...
-    if (block.body.touching.down && !block.hit) {
-      //mark block as hit
-      block.hit = true;
-      //make the mushroom visible
-      //  block.powerup.visible = true;
-      //  var powerup = this.physics.add.image(block.x, block.y, 'powerups', 0)
-      var powerup = powerupGroup.get().setActive(true);
-      powerup.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
-      powerup.enableBody = true;
-      powerup.x = block.x;
-      powerup.y = block.y;
-      powerup.type = 'invincible'
-      powerup.body.setVelocityY(-300);
-      powerup.body.setVelocityX(80)
-      /*  if (Math.floor(Math.random() * 1) > .5) powerup.body.setVelocityX(-80);
-       else powerup.body.setVelocityX(80); */
-      powerup.body.setAllowGravity(true);
-
-      //this.emptyQuestionBlock(powerup)
-
-
-      // powerup.enableBody = true;
-      //animate the rising of the mushroom powerup
-      /* var tween = this.tweens.add({
-        targets: powerup,
-        y: "-=24",
-        ease: 'Linear',
-        duration: 300,
-        onCompleteScope: this,
-        onComplete: function () {
-          // powerup.enableBody = true;
-          //when the animation completes call this function
-          //this.emptyQuestionBlock(block, powerup);
-
-        },
-      }); */
-
-      //animate the box being hit and jumping up slightly
-      var tween = this.tweens.add({
-        targets: block,
-        y: "-=5",
-        ease: 'Linear',
-        yoyo: true,
-        duration: 100
-      });
-    }
-  }
-  emptyQuestionBlock(block, powerup) {
-    //change the sprite of the question mark box
-    // block.setTexture("empty-box");
-    //enable physics on the mushroom powerup
-    // powerup.enableBody = true;
-    //turn mushroom powerups gravity back on
-    powerup.setVelocityX(80)
-    //randomly assign left or right direction to the powerup
-
-  }
-  swordHitEnemy(sword, bad) {
-    this.player.swordHitBox.body.enable = false
-    if (!bad.hit) {
-      // set baddie as being hit and remove physics
-      bad.hit = true
-      bad.disableBody(false, false);
-      //make player jump up in the air a little bit
-      this.explode(bad.x, bad.y)
-
-      //animate baddie, fading out and getting bigger
-      var tween = this.tweens.add({
-        targets: bad,
-        alpha: 0.3,
-        scaleX: 1.5,
-        scaleY: 1.5,
-        ease: 'Linear',
-        duration: 200,
-        onCompleteScope: this,
-        onComplete: function () {
-          //remove the game object
-          this.addPellet(bad.x, bad.y)
-          destroyGameObject(bad);
-
-        },
-      });
-    }
-  }
-  swordHitBox(bullet, box) {
-    this.player.swordHitBox.body.enable = false
-    this.explode(box.x, box.y)
-    //tween coin to score coin in corner shrink
-    var tween = this.tweens.add({
-      targets: box,
-      alpha: 0.3,
-      //angle: 720,
-      //x: scoreCoin.x,
-      //  y: '-=50',
-      //scaleX: 0.5,
-      // scaleY: 0.5,
-      ease: "Linear",
-      duration: 250,
-      onComplete: function () {
-        destroyGameObject(box);
-      }
-    }, this);
-  }
-  bulletHitEnemy(bullet, bad) {
-    this.player.killBullet(bullet)
-    if (!bad.hit) {
-      // set baddie as being hit and remove physics
-      bad.hit = true
-      bad.disableBody(false, false);
-      //make player jump up in the air a little bit
-      this.explode(bad.x, bad.y)
-
-      //animate baddie, fading out and getting bigger
-      var tween = this.tweens.add({
-        targets: bad,
-        alpha: 0.3,
-        scaleX: 1.5,
-        scaleY: 1.5,
-        ease: 'Linear',
-        duration: 200,
-        onCompleteScope: this,
-        onComplete: function () {
-          //remove the game object
-          this.addPellet(bad.x, bad.y)
-          destroyGameObject(bad);
-
-        },
-      });
-    }
-  }
-  addPellet(x, y) {
-    var pellet = pellets.get().setActive(true);
-
-
-    // Place the explosion on the screen, and play the animation.
-    pellet.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
-    pellet.setSize(8, 8).setOffset(8, 4)
-    pellet.type = 'pellet'
-    pellet.x = x;
-    pellet.y = y;
-    var timer = this.time.delayedCall(3000, this.removePellet, [pellet], this);
-    //bullet.play('bullet-fired')
-  }
-  removePellet(pellet) {
-    pellet.setActive(false);
-    pellet.setVisible(false);
-  }
-  bombHitBox(bombHit, box) {
-    this.explode(box.x, box.y)
-    //tween coin to score coin in corner shrink
-    var tween = this.tweens.add({
-      targets: box,
-      alpha: 0.3,
-      //angle: 720,
-      //x: scoreCoin.x,
-      //  y: '-=50',
-      //scaleX: 0.5,
-      // scaleY: 0.5,
-      ease: "Linear",
-      duration: 250,
-      onComplete: function () {
-        destroyGameObject(box);
-      }
-    }, this);
-  }
-  bombHitEnemy(bombHit, bad) {
-
-    if (!bad.hit) {
-      // set baddie as being hit and remove physics
-      bad.hit = true
-      bad.disableBody(false, false);
-      //make player jump up in the air a little bit
-      this.explode(bad.x, bad.y)
-
-      //animate baddie, fading out and getting bigger
-      var tween = this.tweens.add({
-        targets: bad,
-        alpha: 0.3,
-        scaleX: 1.5,
-        scaleY: 1.5,
-        ease: 'Linear',
-        duration: 200,
-        onCompleteScope: this,
-        onComplete: function () {
-          //remove the game object
-          this.addPellet(bad.x, bad.y)
-          destroyGameObject(bad);
-
-        },
-      });
-    }
-  }
-  bulletHitBox(bullet, box) {
-    this.player.killBullet(bullet)
-    this.explode(box.x, box.y)
-    //tween coin to score coin in corner shrink
-    var tween = this.tweens.add({
-      targets: box,
-      alpha: 0.3,
-      //angle: 720,
-      //x: scoreCoin.x,
-      //  y: '-=50',
-      //scaleX: 0.5,
-      // scaleY: 0.5,
-      ease: "Linear",
-      duration: 250,
-      onComplete: function () {
-        destroyGameObject(box);
-      }
-    }, this);
-  }
-  lavaHitLayer(ball, layer) {
-    lavaBall.killAndHide(ball)
-    ball.setPosition(-50, -50)
-  }
-  shakePlatform(player, platform) {
-    //only make platform shake if player is standing on it
-    //console.log('shake')
-    if (player.body.blocked.down || player.body.touching.down) {
-      //do a little camera shake to indicate something bad is going to happen
-      this.cameras.main.shake(5, 0.001);
-      //we need to store the global scope here so we can keep it later
-      var ourScene = this;
-      //do a yoyo tween shaking the platform back and forth and up and down
-      var tween = this.tweens.add({
-        targets: platform,
-        yoyo: true,
-        repeat: 10,
-        x: {
-          from: platform.x,
-          to: platform.x + 2 * 1,
-        },
-        ease: 'Linear',
-        duration: 50,
-        onCompleteScope: this,
-        onComplete: function () {
-          this.destroyPlatform(platform);
-        }
-      });
-    }
-  }
-  destroyPlatform(platform) {
-    var tween = this.tweens.add({
-      targets: platform,
-      alpha: 0,
-      y: "+=25",
-      ease: 'Linear',
-      duration: 100,
-      onComplete: function () {
-        destroyGameObject(platform);
-      }
-    });
-  }
-
   ////////////////////////////////////////////////////
   // HELPERS/OTHER
   ////////////////////////////////////////////////////

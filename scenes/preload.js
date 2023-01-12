@@ -92,7 +92,7 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 100,
       frameHeight: 100
     });
-    this.load.spritesheet("tiles", "assets/sprites/nokia_tiles.png", {
+    this.load.spritesheet("tiles", "assets/sprites/metroid_tiles.png", {
       frameWidth: 16,
       frameHeight: 16,
       margin: 1,
@@ -118,9 +118,15 @@ class preloadGame extends Phaser.Scene {
        frameWidth: 24,
        frameHeight: 12
      }); */
-    this.load.spritesheet('player', 'assets/sprites/nokia_space.png', {
-      frameWidth: 64,
-      frameHeight: 32
+    /*     this.load.spritesheet('player', 'assets/sprites/nokia_space.png', {
+          frameWidth: 64,
+          frameHeight: 32
+        }); */
+    this.load.spritesheet('player', 'assets/sprites/samusS.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+      margin: 1,
+      spacing: 1
     });
     this.load.spritesheet('controller_buttons', 'assets/controls/controller_buttons.png', {
       frameWidth: 22,
@@ -159,6 +165,10 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16
     });
+    this.load.spritesheet('enemy09', 'assets/sprites/enemies/enemy09.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
 
     this.load.spritesheet('powerups', 'assets/sprites/powerups.png', {
       frameWidth: 16,
@@ -176,6 +186,10 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16
     });
+    this.load.spritesheet('door', 'assets/sprites/door_anim.png', {
+      frameWidth: 16,
+      frameHeight: 32
+    });
     this.load.image('platform', 'assets/sprites/platform.png')
 
     this.load.image('aButton', 'assets/controls/a_button.png')
@@ -184,7 +198,7 @@ class preloadGame extends Phaser.Scene {
     this.load.image("touch-slider", "assets/controls/touch-slider.png");
     this.load.image("touch-knob", "assets/controls/touch-knob.png");
     // this.load.json('level', 'assets/test8.json');
-    this.load.tilemapTiledJSON('level', 'assets/levels/nokia4.json')
+    this.load.tilemapTiledJSON('level', 'assets/levels/metroidtest3.json')
   }
   create() {
     this.scene.start("startGame");

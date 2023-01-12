@@ -12,31 +12,31 @@ class Player {
     });
     anims.create({
       key: "player-run",
-      frames: anims.generateFrameNumbers("player", { start: 5, end: 7 }),
+      frames: anims.generateFrameNumbers("player", { start: 4, end: 6 }),
       frameRate: 12,
       repeat: -1
     });
     anims.create({
       key: "player-attack",
-      frames: anims.generateFrameNumbers("player", { start: 15, end: 18 }),
+      frames: anims.generateFrameNumbers("player", { start: 12, end: 14 }),
       frameRate: 22,
       repeat: 0
     });
     anims.create({
       key: "player-roll",
-      frames: anims.generateFrameNumbers("player", { start: 20, end: 23 }),
+      frames: anims.generateFrameNumbers("player", { start: 16, end: 19 }),
       frameRate: 12,
       repeat: -1
     });
     anims.create({
       key: "player-jump",
-      frames: anims.generateFrameNumbers("player", { start: 10, end: 11 }),
+      frames: anims.generateFrameNumbers("player", { start: 8, end: 8 }),
       frameRate: 12,
       repeat: 0
     });
     anims.create({
       key: "player-shoot",
-      frames: anims.generateFrameNumbers("player", { start: 30, end: 32 }),
+      frames: anims.generateFrameNumbers("player", { start: 24, end: 26 }),
       frameRate: 12,
       repeat: 0
     });
@@ -94,7 +94,7 @@ class Player {
     this.isAttack = false
     this.roll = false
     this.bombSet = false
-    this.weapon = 'sword'
+    this.weapon = 'gun'
     this.canShoot = true
     this.isJumping = false
     this.invincible = false

@@ -79,10 +79,12 @@ let layer,
   lavaLaunchers,
   lavaBall,
   pushableBlocks,
+  reappearingBlocks,
   powerupGroup,
   pellets,
   doors,
   bombRadius,
+  lava,
   bulletSpeed = 250,
   shellSpeed = 200,
   wasStanding = false,
@@ -95,33 +97,47 @@ let layer,
   invicibility,
   superPlayerSpeed = 400;
 
-let coinFrame = 67
-let shellFrame = 32
-let questionFrame = 4
-let keyFrame = 55
-let collapseFrame = 42
-let oneWayFrame = 5
+let coinFrame = 32
+let shellFrame = 48
+let questionFrame = 1
+let keyFrame = 26
+let collapseFrame = 6
+let oneWayFrame = 2
 let ladderFrame = 24
-let spikeFrame = 7
-let boxFrame = 43
+let spikeFrame = 4
+let boxFrame = 7
 let bulletFrame = 90
-let bombFrame = 41
-let lavaLauncherFrame = 6
-let lavaBallFrame = 70
-let pushableFrame = 3
-let doorFrame = 28
-let sparkFrame = 96
-let beamFrame = 30
+let bombFrame = 36
+let lavaLauncherFrame = 3
+let lavaBallFrame = 37
+let pushableFrame = 8
+let doorRFrame = 25
+let doorLFrame = 27
+let sparkFrame = 20
+let beamFrame = 16
 let buttonFrame = 14
+let reappearFrame = 5
+let lavaFrame = 10
 
 let playerStandBodyX = 12
-let playerStandBodyXOffset = 26
+let playerStandBodyXOffset = 10
 let playerRollBodyX = 12
-let playerRollBodyXOffset = 26
+let playerRollBodyXOffset = 10
 
-let playerStandBodyY = 20
-let playerStandBodyYOffset = 12
+let playerStandBodyY = 30
+let playerStandBodyYOffset = 2
 let playerRollBodyY = 12
 let playerRollBodyYOffset = 20
 
 //power ups  invincible,            items roll
+let currentRoom = 0
+let rooms = [
+  {
+    id: 0,
+    tileFile: 'metroid_tiles',
+    tileKey: 'tiles',
+    background: 0x000000,
+    fromID: null,
+    toID: 1
+  }
+]
