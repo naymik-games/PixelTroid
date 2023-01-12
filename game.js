@@ -48,7 +48,7 @@ class playGame extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(rooms[0].background);
     //this.cameras.main.setBackgroundColor(0xAFB0B3);
 
-    this.map = this.make.tilemap({ key: "level" });
+    this.map = this.make.tilemap({ key: rooms[currentRoom].roomKey });
     this.tiles = this.map.addTilesetImage(rooms[currentRoom].tileFile, rooms[currentRoom].tileKey);
 
     layer = this.map.createLayer('layer0', this.tiles);
@@ -884,17 +884,21 @@ class playGame extends Phaser.Scene {
       this.input.enabled = false
       if (door.direction == 'right') {
         console.log('going right')
+        currentRoom = rooms[currentRoom].toID
         door.anims.play('effect-door-right', true).once('animationcomplete', function () {
-          this.scene.stop()
-          this.scene.stop('UI')
-          this.scene.start('startGame')
+          this.scene.restart()
+          //this.scene.stop()
+          //this.scene.stop('UI')
+          //this.scene.start('startGame')
         }, this);
       } else {
         door.anims.play('effect-door-left', true).once('animationcomplete', function () {
           console.log('going left')
-          this.scene.stop()
-          this.scene.stop('UI')
-          this.scene.start('startGame')
+          currentRoom = rooms[currentRoom].fromID
+          this.scene.restart()
+          // this.scene.stop()
+          //this.scene.stop('UI')
+          //this.scene.start('startGame')
         }, this);
       }
 

@@ -198,7 +198,9 @@ class preloadGame extends Phaser.Scene {
     this.load.image("touch-slider", "assets/controls/touch-slider.png");
     this.load.image("touch-knob", "assets/controls/touch-knob.png");
     // this.load.json('level', 'assets/test8.json');
-    this.load.tilemapTiledJSON('level', 'assets/levels/metroidtest3.json')
+    this.load.tilemapTiledJSON('area0-0', 'assets/levels/area0-0.json')
+    this.load.tilemapTiledJSON('area0-1', 'assets/levels/area0-1.json')
+    this.load.tilemapTiledJSON('area0-2', 'assets/levels/area0-2.json')
   }
   create() {
     this.scene.start("startGame");

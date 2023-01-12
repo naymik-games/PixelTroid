@@ -136,8 +136,30 @@ let rooms = [
     id: 0,
     tileFile: 'metroid_tiles',
     tileKey: 'tiles',
+    roomKey: 'area0-0',
     background: 0x000000,
     fromID: null,
-    toID: 1
+    toID: 1,
+    area: 0
+  },
+  {
+    id: 1,
+    tileFile: 'metroid_tiles',
+    tileKey: 'tiles',
+    roomKey: 'area0-1',
+    background: 0x000000,
+    fromID: 0,
+    toID: 2,
+    area: 0
+  },
+  {
+    id: 2,
+    tileFile: 'metroid_tiles',
+    tileKey: 'tiles',
+    roomKey: 'area0-2',
+    background: 0x000000,
+    fromID: 1,
+    toID: null,
+    area: 0
   }
 ]

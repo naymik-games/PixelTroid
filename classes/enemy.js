@@ -162,11 +162,13 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 }
 
 const enemeyConfigs = [{
+  //enemy 1 walks side to side
   strength: 2,
   key: 'enemy01',
   fr: 12
 },
 {
+  //eneny 2 flies side to side
   strength: 0,
   key: 'enemy02',
   fr: 3
