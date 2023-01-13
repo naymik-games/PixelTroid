@@ -197,9 +197,9 @@ class Player {
         console.log('shoot')
         // Place the explosion on the screen, and play the animation.
         bullet.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
-        bullet.setSize(8, 8).setOffset(8, 4)
+        bullet.setSize(8, 16).setOffset(8, 4)
         bullet.x = this.sprite.x;
-        bullet.y = this.sprite.y + 7;
+        bullet.y = this.sprite.y - 5;
         bullet.play('bullet-fired')
         if (this.sprite.flipX) {
           bullet.body.setVelocityX(-bulletSpeed)

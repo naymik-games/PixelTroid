@@ -880,21 +880,48 @@ class playGame extends Phaser.Scene {
 
     if (this.player.hasKey) {
       player.disableBody(false, false);
-      //door.disableBody(false, false);
+      // door.body.disableBody(false, false);
       this.input.enabled = false
-      if (door.direction == 'right') {
-        console.log('going right')
-        currentRoom = rooms[currentRoom].toID
+      if (door.direction == 'right1') {
+
+        currentRoom = rooms[currentRoom].rightID1
+        enteredFrom = 'right1'
+        door.anims.play('effect-door-right', true).once('animationcomplete', function () {
+
+          console.log('going right 1')
+          //  console.log('next room ' + currentRoom)
+          //  console.log('connecting door ' + enteredFrom)
+
+          this.scene.restart()
+          //this.scene.stop()
+          //this.scene.stop('UI')
+          //this.scene.start('startGame')
+        }, this);
+      } else if (door.direction == 'right2') {
+        console.log('going right 2')
+        currentRoom = rooms[currentRoom].rightID2
+        enteredFrom = 'right2'
         door.anims.play('effect-door-right', true).once('animationcomplete', function () {
           this.scene.restart()
           //this.scene.stop()
           //this.scene.stop('UI')
           //this.scene.start('startGame')
         }, this);
-      } else {
+      } else if (door.direction == 'left1') {
         door.anims.play('effect-door-left', true).once('animationcomplete', function () {
-          console.log('going left')
-          currentRoom = rooms[currentRoom].fromID
+          console.log('going left 1')
+          currentRoom = rooms[currentRoom].leftID1
+          enteredFrom = 'left1'
+          this.scene.restart()
+          // this.scene.stop()
+          //this.scene.stop('UI')
+          //this.scene.start('startGame')
+        }, this);
+      } else if (door.direction == 'left2') {
+        door.anims.play('effect-door-left', true).once('animationcomplete', function () {
+          console.log('going left 2')
+          currentRoom = rooms[currentRoom].leftID2
+          enteredFrom = 'left2'
           this.scene.restart()
           // this.scene.stop()
           //this.scene.stop('UI')
@@ -1072,7 +1099,7 @@ class playGame extends Phaser.Scene {
     keys = this.physics.add.group({ allowGravity: false });
     for (var i = 0; i < this.thinglayer.length; i++) {
       if (this.thinglayer[i].name == 'Key') {
-        console.log(this.thinglayer[i])
+        // console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
         var key = keys.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'tiles', keyFrame)//99
         key.type = this.thinglayer[i].name
@@ -1112,6 +1139,73 @@ class playGame extends Phaser.Scene {
 
   }
   createPlayer() {
+    console.log('next room ' + currentRoom)
+    console.log('connecting door ' + enteredFrom)
+    var startX
+    var startY
+
+    this.player = new Player(this, 0, 0)
+    console.log(this.player)
+    this.player.sprite.enableBody(false, false);
+    this.player.sprite.setPushable(false)
+    if (enteredFrom == 'none') {
+      for (var i = 0; i < this.thinglayer.length; i++) {
+        if (this.thinglayer[i].name == 'Player') {
+          var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
+
+          startX = worldXY.x + (this.map.tileWidth / 2)
+          startY = worldXY.y - (this.map.tileHeight / 2)
+        }
+      }
+    } else {
+      Phaser.Actions.Call(doors.getChildren(), function (door) {
+
+        if (enteredFrom == 'left1') {
+          if (door.direction == 'right1') {
+            startX = door.x - this.map.tileWidth * 2
+            startY = door.y
+            this.player.sprite.setFlipX(true)
+          }
+        } else if (enteredFrom == 'right1') {
+          if (door.direction == 'left1') {
+            startX = door.x + this.map.tileWidth * 2
+            startY = door.y
+          }
+        } else if (enteredFrom == 'left2') {
+          if (door.direction == 'right2') {
+            startX = door.x - this.map.tileWidth * 2
+            startY = door.y
+            this.player.sprite.setFlipX(true)
+          }
+        } else if (enteredFrom == 'right2') {
+          if (door.direction == 'left2') {
+            startX = door.x + this.map.tileWidth * 2
+            startY = door.y
+          }
+        }
+
+      }, this);
+    }
+
+
+
+
+    this.player.sprite.x = startX
+    this.player.sprite.y = startY
+
+    this.cameras.main.startFollow(this.player.sprite);
+    /*  var sprites = this.map.createFromTiles(30, 0, { key: 'tiles', frame: 0 }, null, null, layer)
+     for (var i = 0; i < sprites.length; i++) {
+       if (this.thinglayer[i].name == 'Player') {
+         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
+         this.player = new Player(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2))
+         this.player.sprite.setPushable(false)
+         this.cameras.main.startFollow(this.player.sprite);
+       }
+     } */
+  }
+  /* createPlayer() {
+
     for (var i = 0; i < this.thinglayer.length; i++) {
       if (this.thinglayer[i].name == 'Player') {
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
@@ -1120,7 +1214,7 @@ class playGame extends Phaser.Scene {
         this.cameras.main.startFollow(this.player.sprite);
       }
     }
-  }
+  } */
   createEnemies() {
 
     enemies = this.physics.add.group({ immovable: true });
@@ -1141,7 +1235,7 @@ class playGame extends Phaser.Scene {
         // console.log('make enemy 2')
       }
     }
-    console.log(enemies)
+    //console.log(enemies)
   }
   createQuestions(layer) {
     questions = this.physics.add.group({ allowGravity: false, immovable: true });
@@ -1248,11 +1342,21 @@ class playGame extends Phaser.Scene {
       frameRate: 14,
       repeat: 0
     });
+
     doors = this.physics.add.group({ allowGravity: false, immovable: true });
-    var sprites = this.map.createFromTiles(doorRFrame, 0, { key: 'door', frame: 0 }, null, null, layer)
+    //right door 1
+    var sprites = this.map.createFromTiles(doorR1Frame, 0, { key: 'door', frame: 0 }, null, null, layer)
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
-      sprites[i].direction = 'right'
+      sprites[i].direction = 'right1'
+      //  sprites[i].y += (this.map.tileHeight / 2)
+      doors.add(sprites[i])
+    }
+    //right door 2
+    var sprites = this.map.createFromTiles(doorR2Frame, 0, { key: 'door', frame: 0 }, null, null, layer)
+    for (var i = 0; i < sprites.length; i++) {
+      sprites[i].x += (this.map.tileWidth / 2)
+      sprites[i].direction = 'right2'
       //  sprites[i].y += (this.map.tileHeight / 2)
       doors.add(sprites[i])
     }
@@ -1262,13 +1366,23 @@ class playGame extends Phaser.Scene {
       frameRate: 14,
       repeat: 0
     });
-    var sprites = this.map.createFromTiles(doorLFrame, 0, { key: 'door', frame: 4 }, null, null, layer)
+    //left door 1
+    var sprites = this.map.createFromTiles(doorL1Frame, 0, { key: 'door', frame: 4 }, null, null, layer)
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
-      sprites[i].direction = 'left'
+      sprites[i].direction = 'left1'
       //  sprites[i].y += (this.map.tileHeight / 2)
       doors.add(sprites[i])
     }
+    //left door 2
+    var sprites = this.map.createFromTiles(doorL2Frame, 0, { key: 'door', frame: 4 }, null, null, layer)
+    for (var i = 0; i < sprites.length; i++) {
+      sprites[i].x += (this.map.tileWidth / 2)
+      sprites[i].direction = 'left2'
+      //  sprites[i].y += (this.map.tileHeight / 2)
+      doors.add(sprites[i])
+    }
+    console.log(doors)
   }
   createBoxes(layer) {
     boxes = this.physics.add.group({ allowGravity: false, immovable: true });

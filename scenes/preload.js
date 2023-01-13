@@ -201,6 +201,8 @@ class preloadGame extends Phaser.Scene {
     this.load.tilemapTiledJSON('area0-0', 'assets/levels/area0-0.json')
     this.load.tilemapTiledJSON('area0-1', 'assets/levels/area0-1.json')
     this.load.tilemapTiledJSON('area0-2', 'assets/levels/area0-2.json')
+    this.load.tilemapTiledJSON('area0-3', 'assets/levels/area0-3.json')
+    this.load.tilemapTiledJSON('area0-4', 'assets/levels/area0-4.json')
   }
   create() {
     this.scene.start("startGame");

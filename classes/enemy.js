@@ -181,7 +181,8 @@ const enemeyConfigs = [{
 },
 
 {
-  strength: 0,
+  //Enemy4 attracked to player withing range
+  strength: 1,
   key: 'enemy04',
   fr: 12
 },
@@ -211,6 +212,7 @@ const enemeyConfigs = [{
 },
 
 {
+  //Enemy9 flies down to ground towards payer when near
   strength: 0,
   key: 'enemy09',
   fr: 12

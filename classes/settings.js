@@ -100,7 +100,7 @@ let layer,
 let coinFrame = 32
 let shellFrame = 48
 let questionFrame = 1
-let keyFrame = 26
+let keyFrame = 40
 let collapseFrame = 6
 let oneWayFrame = 2
 let ladderFrame = 24
@@ -111,13 +111,15 @@ let bombFrame = 36
 let lavaLauncherFrame = 3
 let lavaBallFrame = 37
 let pushableFrame = 8
-let doorRFrame = 25
-let doorLFrame = 27
+let doorR1Frame = 25
+let doorL1Frame = 27
+let doorR2Frame = 26
+let doorL2Frame = 28
 let sparkFrame = 20
 let beamFrame = 16
 let buttonFrame = 14
 let reappearFrame = 5
-let lavaFrame = 10
+let lavaFrame = 24
 
 let playerStandBodyX = 12
 let playerStandBodyXOffset = 10
@@ -131,6 +133,7 @@ let playerRollBodyYOffset = 20
 
 //power ups  invincible,            items roll
 let currentRoom = 0
+let enteredFrom = 'none'
 let rooms = [
   {
     id: 0,
@@ -138,8 +141,10 @@ let rooms = [
     tileKey: 'tiles',
     roomKey: 'area0-0',
     background: 0x000000,
-    fromID: null,
-    toID: 1,
+    leftID1: null,//room id connected to room
+    leftID2: null,
+    rightID1: 1,
+    rightID2: null,
     area: 0
   },
   {
@@ -148,8 +153,10 @@ let rooms = [
     tileKey: 'tiles',
     roomKey: 'area0-1',
     background: 0x000000,
-    fromID: 0,
-    toID: 2,
+    leftID1: 0,
+    leftID2: null,
+    rightID1: 2,
+    rightID2: null,
     area: 0
   },
   {
@@ -158,8 +165,34 @@ let rooms = [
     tileKey: 'tiles',
     roomKey: 'area0-2',
     background: 0x000000,
-    fromID: 1,
-    toID: null,
+    leftID1: 1,
+    leftID2: 3,
+    rightID1: 4,
+    rightID2: null,
+    area: 0
+  },
+  {
+    id: 3,
+    tileFile: 'metroid_tiles',
+    tileKey: 'tiles',
+    roomKey: 'area0-3',
+    background: 0x000000,
+    leftID1: null,
+    leftID2: null,
+    rightID1: null,
+    rightID2: 2,
+    area: 0
+  },
+  {
+    id: 4,
+    tileFile: 'metroid_tiles',
+    tileKey: 'tiles',
+    roomKey: 'area0-4',
+    background: 0x000000,
+    leftID1: 2,
+    leftID2: null,
+    rightID1: null,
+    rightID2: null,
     area: 0
   }
 ]
