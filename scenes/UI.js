@@ -33,7 +33,7 @@ class UI extends Phaser.Scene {
     this.coinIcon = this.add.image(game.config.width - 48, 45, 'coin', 0).setScale(2)
     this.coinCountText = this.add.text(game.config.width - 74, 35, '0', { fontFamily: 'PixelFont', fontSize: '50px', color: '#C6EFD8', align: 'left' }).setOrigin(1, .5)
 
-    this.keyIcon = this.add.image(game.config.width - 48, 100, 'tiles', keyFrame).setScale(3).setAlpha(0)
+    this.keyIcon = this.add.image(game.config.width - 48, 100, rooms[currentRoom].tileKey, keyFrame).setScale(3).setAlpha(0)
     this.Main = this.scene.get('playGame');
     //this.score = 0;
     // this.scoreText = this.add.bitmapText(85, 100, 'topaz', this.score, 80).setOrigin(.5).setTint(0xcbf7ff).setAlpha(1);
@@ -73,7 +73,7 @@ class UI extends Phaser.Scene {
 
     this.Main.events.on('score', function () {
 
-      var health = this.Main.player.health
+      var health = playerData.health
       var value = health / 100
       progressBar.clear()
       progressBar.fillStyle(0xC6EFD8, 1);
@@ -109,9 +109,9 @@ class UI extends Phaser.Scene {
       }
     } else {
       this.Main.player.isAttack = true
-      if (this.Main.player.weapon == 'sword') {
+      if (playerData.weapon == 'sword') {
         this.Main.player.smash()
-      } else if (this.Main.player.weapon == 'gun') {
+      } else if (playerData.weapon == 'gun') {
         this.Main.player.shoot()
       }
 

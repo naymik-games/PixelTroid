@@ -92,7 +92,13 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 100,
       frameHeight: 100
     });
-    this.load.spritesheet("tiles", "assets/sprites/metroid_tiles.png", {
+    this.load.spritesheet("metroid_tiles", "assets/sprites/metroid_tiles.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+      margin: 1,
+      spacing: 1
+    });
+    this.load.spritesheet("surface_tiles", "assets/sprites/surface_tiles.png", {
       frameWidth: 16,
       frameHeight: 16,
       margin: 1,
@@ -186,6 +192,12 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16
     });
+    this.load.spritesheet('items', 'assets/sprites/items_.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+      margin: 1,
+      spacing: 1
+    });
     this.load.spritesheet('door', 'assets/sprites/door_anim.png', {
       frameWidth: 16,
       frameHeight: 32
@@ -198,11 +210,11 @@ class preloadGame extends Phaser.Scene {
     this.load.image("touch-slider", "assets/controls/touch-slider.png");
     this.load.image("touch-knob", "assets/controls/touch-knob.png");
     // this.load.json('level', 'assets/test8.json');
-    this.load.tilemapTiledJSON('area0-0', 'assets/levels/area0-0.json')
-    this.load.tilemapTiledJSON('area0-1', 'assets/levels/area0-1.json')
-    this.load.tilemapTiledJSON('area0-2', 'assets/levels/area0-2.json')
-    this.load.tilemapTiledJSON('area0-3', 'assets/levels/area0-3.json')
-    this.load.tilemapTiledJSON('area0-4', 'assets/levels/area0-4.json')
+
+    /*   this.load.tilemapTiledJSON('area0-1', 'assets/levels/area0-1.json')
+      this.load.tilemapTiledJSON('area0-2', 'assets/levels/area0-2.json')
+      this.load.tilemapTiledJSON('area0-3', 'assets/levels/area0-3.json')
+      this.load.tilemapTiledJSON('area0-4', 'assets/levels/area0-4.json') */
   }
   create() {
     this.scene.start("startGame");

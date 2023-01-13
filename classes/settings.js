@@ -38,7 +38,8 @@ var defaultValues = {
   levelStatus: [0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
   totalSquares: 0,
   group: 0,
-  currentLevel: 0
+  currentLevel: 0,
+  weapon: 'sword'
 }
 
 let layer,
@@ -76,6 +77,7 @@ let layer,
   sparks,
   beams,
   buttons,
+  items,
   lavaLaunchers,
   lavaBall,
   pushableBlocks,
@@ -130,6 +132,22 @@ let playerStandBodyY = 30
 let playerStandBodyYOffset = 2
 let playerRollBodyY = 12
 let playerRollBodyYOffset = 20
+// /'Beam', 'Long Beam', 'Ice Beam', 'High Jump', 'Power Suit', 'Morph', 'Bombs', 'Missle Supply', 'Energy Tank',
+let playerData
+let playerDataDefault = {
+  health: 100,
+  hasBeam: false,
+  hasLong: false,
+  hasIce: false,
+  hasJump: false,
+  hasPower: false,
+  hasMorph: false,
+  hasBombs: false,
+  coinCount: 0,
+  inRoom: 0,
+  weapon: 'sword'
+}
+
 
 //power ups  invincible,            items roll
 let currentRoom = 0
@@ -137,62 +155,67 @@ let enteredFrom = 'none'
 let rooms = [
   {
     id: 0,
-    tileFile: 'metroid_tiles',
-    tileKey: 'tiles',
-    roomKey: 'area0-0',
-    background: 0x000000,
+    tileFile: 'surface_tiles',
+    tileKey: 'surface_tiles',
+    roomKey: 'area01-0',
+    background: 0x103050,
     leftID1: null,//room id connected to room
     leftID2: null,
     rightID1: 1,
     rightID2: null,
-    area: 0
+    area: 0,
+    requireKey: true
   },
   {
     id: 1,
     tileFile: 'metroid_tiles',
-    tileKey: 'tiles',
+    tileKey: 'metroid_tiles',
     roomKey: 'area0-1',
     background: 0x000000,
     leftID1: 0,
     leftID2: null,
     rightID1: 2,
     rightID2: null,
-    area: 0
+    area: 0,
+    requireKey: false
   },
   {
     id: 2,
     tileFile: 'metroid_tiles',
-    tileKey: 'tiles',
+    tileKey: 'metroid_tiles',
     roomKey: 'area0-2',
     background: 0x000000,
     leftID1: 1,
     leftID2: 3,
     rightID1: 4,
     rightID2: null,
-    area: 0
+    area: 0,
+    requireKey: true
   },
   {
     id: 3,
     tileFile: 'metroid_tiles',
-    tileKey: 'tiles',
+    tileKey: 'metroid_tiles',
     roomKey: 'area0-3',
     background: 0x000000,
     leftID1: null,
     leftID2: null,
     rightID1: null,
     rightID2: 2,
-    area: 0
+    area: 0,
+    requireKey: true
   },
   {
     id: 4,
     tileFile: 'metroid_tiles',
-    tileKey: 'tiles',
+    tileKey: 'metroid_tiles',
     roomKey: 'area0-4',
     background: 0x000000,
     leftID1: 2,
     leftID2: null,
     rightID1: null,
     rightID2: null,
-    area: 0
+    area: 0,
+    requireKey: true
   }
 ]

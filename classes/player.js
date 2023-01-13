@@ -49,7 +49,7 @@ class Player {
 
     this.sprite.body.setSize(playerStandBodyX, playerStandBodyY).setOffset(playerStandBodyXOffset, playerStandBodyYOffset);//15,15 24.5, 17
 
-    this.swordHitBox = this.scene.add.rectangle(x, y, 8, 8, 0xff0000, 0)
+    this.swordHitBox = this.scene.add.rectangle(x, y, 12, 12, 0xff0000, 0)
     this.scene.physics.add.existing(this.swordHitBox)
     this.swordHitBox.body.setAllowGravity(false)
     this.swordHitBox.body.enable = false
@@ -80,7 +80,7 @@ class Player {
     bombRadius.add(this.bombHitBoxUp)
 
     this.invulnerable = false;
-    this.health = 100
+
     this.coinCount = 0
     this.dpad = {}
     this.dpad.isUp = false
@@ -94,7 +94,7 @@ class Player {
     this.isAttack = false
     this.roll = false
     this.bombSet = false
-    this.weapon = 'gun'
+    //this.weapon = 'gun'
     this.canShoot = true
     this.isJumping = false
     this.invincible = false
@@ -182,7 +182,7 @@ class Player {
     this.swordHitBox.body.enable = true
     var off = this.sprite.flipX ? -12 : 12
     this.swordHitBox.x = this.sprite.x + off
-    this.swordHitBox.y = this.sprite.y + 8
+    this.swordHitBox.y = this.sprite.y
 
 
 
@@ -206,10 +206,10 @@ class Player {
         } else {
           bullet.body.setVelocityX(bulletSpeed)
         }
-        var timer = this.scene.time.delayedCall(250, function () {
+        var timer = this.scene.time.delayedCall(150, function () {
           this.canShoot = true
         }, null, this);
-        var timer2 = this.scene.time.delayedCall(500, this.killBullet, [bullet], this);
+        var timer2 = this.scene.time.delayedCall(300, this.killBullet, [bullet], this);
       }
 
     }
@@ -229,10 +229,10 @@ class Player {
 
 
       //remove a heart from out count stored on the player object
-      this.health -= 10;
+      playerData.health -= 10;
       this.scene.addScore()
       //if hearts is 0 or less you're dead as you are out of lives
-      if (this.health <= 0) {
+      if (playerData.health <= 0) {
         //remove physics from player
         this.sprite.disableBody(false, false);
         //and play death animation
