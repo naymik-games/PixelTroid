@@ -94,6 +94,7 @@ class Player {
     this.isAttack = false
     this.roll = false
     this.bombSet = false
+
     //this.weapon = 'gun'
     this.canShoot = true
     this.isJumping = false
@@ -209,7 +210,7 @@ class Player {
         var timer = this.scene.time.delayedCall(150, function () {
           this.canShoot = true
         }, null, this);
-        var timer2 = this.scene.time.delayedCall(300, this.killBullet, [bullet], this);
+        var timer2 = this.scene.time.delayedCall(playerData.range, this.killBullet, [bullet], this);
       }
 
     }

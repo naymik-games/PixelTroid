@@ -144,8 +144,10 @@ let playerDataDefault = {
   hasMorph: false,
   hasBombs: false,
   coinCount: 0,
+  missleCount: 0,
   inRoom: 0,
-  weapon: 'sword'
+  weapon: 'sword',
+  range: 300
 }
 
 

@@ -17,7 +17,7 @@ window.onload = function () {
       default: 'arcade',
       arcade: {
         gravity: { y: 1100 },
-        debug: true
+        debug: false
       }
     },
     scene: [preloadGame, startGame, playGame, UI]
@@ -215,6 +215,7 @@ class playGame extends Phaser.Scene {
     this.physics.world.addCollider(bullets, boxes, this.bulletHitBox, null, this);
     this.physics.world.addCollider(bullets, reappearingBlocks, this.bulletHitReappear, null, this);
     this.physics.world.addCollider(bullets, enemies, this.bulletHitEnemy, null, this);
+    this.physics.world.addCollider(bullets, doors, this.bulletHitDoor, null, this);
     //object collide
     this.physics.world.addCollider(shells, layer);
     this.physics.world.addCollider(boxes, layer);
@@ -689,6 +690,10 @@ class playGame extends Phaser.Scene {
       playerData.hasBeam = true
       playerData.weapon = 'gun'
     }
+    if (item.type == 'Long Beam') {
+      playerData.hasLong = true
+      playerData.range = 900
+    }
   }
   collectObject(player, gameObject) {
     //stop coin for being collected twice, as it will stick around on the screen as it animnates
@@ -698,8 +703,12 @@ class playGame extends Phaser.Scene {
       this.updateCoin()
     }
     if (gameObject.type == 'pellet') {
-      playerData.health += Phaser.Math.Between(1, 2) == 1 ? 3 : 5
+      playerData.health += gameObject.amount
       this.addScore()
+    }
+    if (gameObject.type == 'missle') {
+      playerData.missleCount += gameObject.amount
+      //this.addScore()
     }
     if (gameObject.type == 'Key') {
       this.player.hasKey = true
@@ -902,7 +911,81 @@ class playGame extends Phaser.Scene {
       block.body.setImmovable(true)
     }
   }
+  bulletHitDoor(bullet, door) {
+    //effect-door-left-close
+    if (this.player.hasKey || !rooms[currentRoom].requireKey) {
+      if (door.direction == 'right1' || door.direction == 'right2') {
+        if (!door.open) {
+          door.open = true
+          door.anims.play('effect-door-right', true).once('animationcomplete', function () {
+
+            setTimeout(() => {
+              door.anims.play('effect-door-right-close', true)
+              door.open = false
+            }, 2000);
+
+          }, this);
+        }
+
+      } else if (door.direction == 'left1' || door.direction == 'left2') {
+        if (!door.open) {
+          door.open = true
+          door.anims.play('effect-door-left', true).once('animationcomplete', function () {
+            setTimeout(() => {
+              door.anims.play('effect-door-left-close', true)
+              door.open = false
+            }, 2000);
+
+          }, this);
+        }
+      }
+    }
+
+  }
   hitDoor(player, door) {
+    //console.log(door)
+
+    if (door.open) {
+      player.disableBody(false, false);
+      // door.body.disableBody(false, false);
+      this.input.enabled = false
+      if (door.direction == 'right1') {
+
+        currentRoom = rooms[currentRoom].rightID1
+        enteredFrom = 'right1'
+        setTimeout(() => {
+          this.scene.restart();
+        }, 150);
+
+      } else if (door.direction == 'right2') {
+        console.log('going right 2')
+        currentRoom = rooms[currentRoom].rightID2
+        enteredFrom = 'right2'
+        setTimeout(() => {
+          this.scene.restart();
+        }, 150);
+
+      } else if (door.direction == 'left1') {
+        console.log('going left 1')
+        currentRoom = rooms[currentRoom].leftID1
+        enteredFrom = 'left1'
+        setTimeout(() => {
+          this.scene.restart();
+        }, 150);
+
+      } else if (door.direction == 'left2') {
+        console.log('going left 2')
+        currentRoom = rooms[currentRoom].leftID2
+        enteredFrom = 'left2'
+        setTimeout(() => {
+          this.scene.restart();
+        }, 150);
+      }
+
+    }
+
+  }
+  hitDoorSAVE(player, door) {
     //console.log(door)
 
     if (this.player.hasKey || !rooms[currentRoom].requireKey) {
@@ -1103,7 +1186,23 @@ class playGame extends Phaser.Scene {
     // Place the explosion on the screen, and play the animation.
     pellet.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
     pellet.setSize(8, 8).setOffset(8, 4)
-    pellet.type = 'pellet'
+
+    var ran = Phaser.Math.Between(1, 100)
+    if (ran < 50) {
+      pellet.setFrame(0)
+      pellet.amount = 3
+      pellet.type = 'pellet'
+    } else if (ran < 80) {
+      pellet.setFrame(1)
+      pellet.amount = 10
+      pellet.type = 'pellet'
+    } else {
+      pellet.setFrame(2)
+      pellet.amount = 5
+      pellet.type = 'missle'
+    }
+
+
     pellet.x = x;
     pellet.y = y;
     var timer = this.time.delayedCall(3000, this.removePellet, [pellet], this);
@@ -1446,13 +1545,19 @@ class playGame extends Phaser.Scene {
       frameRate: 14,
       repeat: 0
     });
-
+    this.anims.create({
+      key: 'effect-door-right-close',
+      frames: this.anims.generateFrameNumbers("door", { frames: [3, 2, 1, 0] }),
+      frameRate: 14,
+      repeat: 0
+    });
     doors = this.physics.add.group({ allowGravity: false, immovable: true });
     //right door 1
     var sprites = this.map.createFromTiles(doorR1Frame, 0, { key: 'door', frame: 0 }, null, null, layer)
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].direction = 'right1'
+      sprites[i].open = false
       //  sprites[i].y += (this.map.tileHeight / 2)
       doors.add(sprites[i])
     }
@@ -1461,6 +1566,7 @@ class playGame extends Phaser.Scene {
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].direction = 'right2'
+      sprites[i].open = false
       //  sprites[i].y += (this.map.tileHeight / 2)
       doors.add(sprites[i])
     }
@@ -1470,11 +1576,18 @@ class playGame extends Phaser.Scene {
       frameRate: 14,
       repeat: 0
     });
+    this.anims.create({
+      key: 'effect-door-left-close',
+      frames: this.anims.generateFrameNumbers("door", { frames: [7, 6, 5, 4] }),
+      frameRate: 14,
+      repeat: 0
+    });
     //left door 1
     var sprites = this.map.createFromTiles(doorL1Frame, 0, { key: 'door', frame: 4 }, null, null, layer)
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].direction = 'left1'
+      sprites[i].open = false
       //  sprites[i].y += (this.map.tileHeight / 2)
       doors.add(sprites[i])
     }
@@ -1483,6 +1596,7 @@ class playGame extends Phaser.Scene {
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].direction = 'left2'
+      sprites[i].open = false
       //  sprites[i].y += (this.map.tileHeight / 2)
       doors.add(sprites[i])
     }
