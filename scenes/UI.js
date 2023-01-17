@@ -37,7 +37,7 @@ class UI extends Phaser.Scene {
     this.Main = this.scene.get('playGame');
     //this.score = 0;
     // this.scoreText = this.add.bitmapText(85, 100, 'topaz', this.score, 80).setOrigin(.5).setTint(0xcbf7ff).setAlpha(1);
-    this.controlsY = game.config.height - 100
+    this.controlsY = game.config.height - 75
     /*   var base = this.add.image(0, 0, 'controller_buttons', 0).setScale(2)
       var thumb = this.add.image(0, 0, 'controller_buttons', 1).setScale(2)
       this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
@@ -57,16 +57,16 @@ class UI extends Phaser.Scene {
 
 
 
-    this.aButton = this.add.image(game.config.width / 2 + 75, this.controlsY, "controller_buttons", 3).setScale(4).setInteractive();
+    this.aButton = this.add.image(game.config.width - 250, this.controlsY, "controller_buttons", 3).setScale(6).setInteractive();
     this.aButton.on('pointerdown', this.doA, this);
     this.aButton.on('pointerup', this.doADone, this);
 
 
-    this.bButton = this.add.image(game.config.width / 2, this.controlsY + 50, "controller_buttons", 2).setScale(4).setInteractive();
+    this.bButton = this.add.image(game.config.width - 350, this.controlsY + 25, "controller_buttons", 2).setScale(6).setInteractive();
     this.bButton.on('pointerdown', this.doB, this);
     this.bButton.on('pointerup', this.doBDone, this);
 
-    this.yButton = this.add.image(game.config.width / 2 + 150, this.controlsY, "controller_buttons", 4).setScale(4).setInteractive();
+    this.yButton = this.add.image(game.config.width - 150, this.controlsY, "controller_buttons", 4).setScale(6).setInteractive();
     this.yButton.on('pointerdown', this.doY, this);
     this.yButton.on('pointerup', this.doYDone, this);
 
