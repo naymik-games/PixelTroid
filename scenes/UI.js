@@ -14,7 +14,7 @@ class UI extends Phaser.Scene {
   }
   create() {
 
-    this.header = this.add.image(game.config.width / 2, 0, 'blank').setOrigin(.5, 0).setTint(0x262626);
+    this.header = this.add.image(game.config.width / 2, 0, 'blank').setOrigin(.5, 0).setTint(0x000000);//0x262626
     this.header.displayWidth = game.config.width;
     this.header.displayHeight = 125;
     var value = 1
@@ -24,9 +24,9 @@ class UI extends Phaser.Scene {
     progressBox.fillStyle(0x454545, .8);
     progressBox.fillRect(50, 25, 150, 35);
     progressBar.clear()
-    progressBar.fillStyle(0xC6EFD8, 1);
+    progressBar.fillStyle(0x00ff00, 1);
     progressBar.fillRect(60, 35, 125 * value, 15)
-    this.eText = this.add.text(25, 35, 'E', { fontFamily: 'PixelFont', fontSize: '50px', color: '#C6EFD8', align: 'left' }).setOrigin(.5)
+    this.eText = this.add.text(25, 35, 'E', { fontFamily: 'PixelFont', fontSize: '50px', color: '#fafafa', align: 'left' }).setOrigin(.5)//C6EFD8
 
     this.itemsIcon = this.add.image(game.config.width - 132, 45, 'items', 0).setScale(2)
 
@@ -76,7 +76,7 @@ class UI extends Phaser.Scene {
       var health = playerData.health
       var value = health / 100
       progressBar.clear()
-      progressBar.fillStyle(0xC6EFD8, 1);
+      progressBar.fillStyle(0x00ff00, 1);
       progressBar.fillRect(60, 35, 125 * value, 15)
     }, this);
     this.Main.events.on('coin', function () {

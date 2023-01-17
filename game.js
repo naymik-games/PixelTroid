@@ -224,7 +224,7 @@ class playGame extends Phaser.Scene {
     this.physics.world.addCollider(boxes, boxes);
     this.physics.world.addCollider(boxes, shells);
     this.physics.world.addCollider(spikes, shells);
-    this.physics.world.addCollider(enemies, layer);
+
     this.physics.add.collider(hPlatforms, layer);
     this.physics.add.collider(powerupGroup, layer);
     //object collide with action
@@ -238,6 +238,7 @@ class playGame extends Phaser.Scene {
     this.physics.world.addCollider(enemies, spikes);
     this.physics.world.addCollider(enemies, lava);
     this.physics.world.addCollider(enemies, boxes);
+    this.physics.world.addCollider(enemies, layer);
 
 
 
@@ -818,7 +819,7 @@ class playGame extends Phaser.Scene {
   }
 
   bombHitBox(bombHit, box) {
-    this.explode(box.x, box.y)
+    //this.explode(box.x, box.y)
     //tween coin to score coin in corner shrink
     var tween = this.tweens.add({
       targets: box,
@@ -1254,42 +1255,42 @@ class playGame extends Phaser.Scene {
         beam.type = this.thinglayer[i].name
         beam.setOrigin(.5, .5);
       }
-      if (this.thinglayer[i].name == 'Long Beam') {
+      if (this.thinglayer[i].name == 'Long Beam' && !playerData.hasLong) {
         //console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
         var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 1)//99
         beam.type = this.thinglayer[i].name
         beam.setOrigin(.5, .5);
       }
-      if (this.thinglayer[i].name == 'Ice Beam') {
+      if (this.thinglayer[i].name == 'Ice Beam' && !playerData.hasIce) {
         //console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
         var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 2)//99
         beam.type = this.thinglayer[i].name
         beam.setOrigin(.5, .5);
       }
-      if (this.thinglayer[i].name == 'High Jump') {
+      if (this.thinglayer[i].name == 'High Jump' && !playerData.hasJump) {
         //console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
         var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 3)//99
         beam.type = this.thinglayer[i].name
         beam.setOrigin(.5, .5);
       }
-      if (this.thinglayer[i].name == 'Power Suit') {
+      if (this.thinglayer[i].name == 'Power Suit' && !playerData.hasPower) {
         //console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
         var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 4)//99
         beam.type = this.thinglayer[i].name
         beam.setOrigin(.5, .5);
       }
-      if (this.thinglayer[i].name == 'Morph') {
+      if (this.thinglayer[i].name == 'Morph' && !playerData.hasMorph) {
         //console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
         var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 5)//99
         beam.type = this.thinglayer[i].name
         beam.setOrigin(.5, .5);
       }
-      if (this.thinglayer[i].name == 'Bombs') {
+      if (this.thinglayer[i].name == 'Bombs' && !playerData.hasBombs) {
         //console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
         var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 6)//99
