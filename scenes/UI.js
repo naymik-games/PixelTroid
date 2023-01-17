@@ -103,7 +103,7 @@ class UI extends Phaser.Scene {
 
     //this.Main.player.doAction()
     if (this.Main.player.roll) {
-      if (!this.Main.player.bombSet) {
+      if (!this.Main.player.bombSet && playerData.hasBombs) {
         this.Main.player.bombSet = true
         this.Main.player.setBomb()
       }
@@ -125,9 +125,12 @@ class UI extends Phaser.Scene {
     // this.main.game.events.emit(EVENTS_NAME.smash);
   }
   doB() {
+    if (playerData.hasMorph) {
+      this.Main.player.roll = true
+      this.Main.roll()
+    }
     //this.Main.player.dpad.isB = true
-    this.Main.player.roll = true
-    this.Main.roll()
+
     // this.main.game.events.emit(EVENTS_NAME.attack);
     // this.main.game.events.emit(EVENTS_NAME.smash);
   }

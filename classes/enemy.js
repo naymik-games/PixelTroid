@@ -26,7 +26,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.strength = enemeyConfigs[kind].strength
     this.frozen = false
     this.maxDistance = maxDistance
-
+    this.saveXYV = { x: 0, y: 0 }
     this.anims.create({
       key: 'enemy-run',
       frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 2 }),
@@ -132,12 +132,16 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   enemyHit(damage) {
     this.strength -= damage
     if (this.strength > 0) {
-      this.hit = false
+
       if (playerData.hasIce) {
         if (this.frozen) {
           this.frozen = false
+          this.body.velocity.x = this.saveXYV.x
+          this.body.velocity.y = this.saveXYV.y
           this.clearTint()
         } else {
+          this.saveXYV.x = this.body.velocity.x
+          this.saveXYV.y = this.body.velocity.y
           this.body.velocity.x = 0
           this.body.velocity.y = 0
           this.frozen = true
@@ -153,6 +157,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         ease: 'Linear',
         duration: 100,
       });
+      this.hit = false
     } else {
       this.disableBody(false, false);
       //make player jump up in the air a little bit
@@ -180,13 +185,13 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
 const enemeyConfigs = [{
   //enemy 1 walks side to side
-  strength: 2,
+  strength: 4,
   key: 'enemy01',
   fr: 12
 },
 {
   //eneny 2 flies side to side
-  strength: 2,
+  strength: 4,
   key: 'enemy02',
   fr: 3
 },

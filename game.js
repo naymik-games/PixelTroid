@@ -705,6 +705,14 @@ class playGame extends Phaser.Scene {
       playerData.hasJump = true
       playerData.jumpVelocity = 600
     }
+    if (item.type == 'Morph') {
+      playerData.hasMorph = true
+
+    }
+    if (item.type == 'Bombs') {
+      playerData.hasBombs = true
+
+    }
   }
   collectObject(player, gameObject) {
     //stop coin for being collected twice, as it will stick around on the screen as it animnates
@@ -1279,21 +1287,21 @@ class playGame extends Phaser.Scene {
       if (this.thinglayer[i].name == 'Power Suit' && !playerData.hasPower) {
         //console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
-        var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 4)//99
+        var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 6)//99
         beam.type = this.thinglayer[i].name
         beam.setOrigin(.5, .5);
       }
       if (this.thinglayer[i].name == 'Morph' && !playerData.hasMorph) {
         //console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
-        var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 5)//99
+        var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 4)//99
         beam.type = this.thinglayer[i].name
         beam.setOrigin(.5, .5);
       }
       if (this.thinglayer[i].name == 'Bombs' && !playerData.hasBombs) {
         //console.log(this.thinglayer[i])
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
-        var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 6)//99
+        var beam = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 5)//99
         beam.type = this.thinglayer[i].name
         beam.setOrigin(.5, .5);
       }

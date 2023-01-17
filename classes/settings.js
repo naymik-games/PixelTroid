@@ -166,10 +166,10 @@ let areas = [
 let rooms = [
   {
     id: 0,
-    tileFile: 'metroid_tiles',
-    tileKey: 'metroid_tiles',
+    tileFile: 'surface_tiles',
+    tileKey: 'surface_tiles',
     roomKey: 'area0-0',
-    background: 0x000000,
+    background: 0x0C243D,
     leftID1: null,//room id connected to room
     leftID2: null,
     rightID1: 1,
