@@ -174,7 +174,7 @@ class Player {
     }, null, this);
     //check if player is over bomb and jump hero
     if (Math.abs(bomb.x - this.sprite.x) <= 16 && Math.abs(bomb.y - this.sprite.y) < 10) {
-      this.sprite.body.velocity.y = -jumpVelocity;
+      this.sprite.body.velocity.y = -350;
     }
 
   }

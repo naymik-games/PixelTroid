@@ -200,16 +200,18 @@ class playGame extends Phaser.Scene {
     this.physics.add.overlap(this.player.sprite, lava, this.hitObject, null, this);
     this.physics.add.collider(this.player.sprite, sparks, this.hitObject, null, this);
     this.physics.add.collider(this.player.sprite, lavaBall, this.playerHitLavaBall, null, this);
-    this.physics.add.overlap(this.player.sprite, enemies, this.hitEnemy, null, this);
+
     this.physics.add.overlap(this.player.sprite, beams, this.hitObject, null, this);
     //player weapons
     this.physics.add.overlap(this.player.swordHitBox, enemies, this.swordHitEnemy, null, this);
     this.physics.add.overlap(this.player.swordHitBox, boxes, this.swordHitBox, null, this);
     this.physics.add.overlap(this.player.swordHitBox, reappearingBlocks, this.bombHitReappear, null, this);
+    this.physics.world.addCollider(this.player.swordHitBox, doors, this.bulletHitDoor, null, this);
 
     this.physics.world.addCollider(bombRadius, boxes, this.bombHitBox, null, this);
     this.physics.world.addCollider(bombRadius, enemies, this.bombHitEnemy, null, this);
     this.physics.world.addCollider(bombRadius, reappearingBlocks, this.bombHitReappear, null, this);
+    this.physics.world.addCollider(bombRadius, doors, this.bulletHitDoor, null, this);
 
     this.physics.world.addCollider(bullets, layer);
     this.physics.world.addCollider(bullets, boxes, this.bulletHitBox, null, this);
@@ -479,11 +481,11 @@ class playGame extends Phaser.Scene {
       if (standing) {
         jumping = true;
         this.player.roll = false
-        this.player.sprite.body.setVelocityY(-jumpVelocity);
+        this.player.sprite.body.setVelocityY(-playerData.jumpVelocity);
         this.player.dpad.isY = false
         jumps--
       } else if (jumps > 0 || this.player.dpad.isY) {
-        this.player.sprite.body.setVelocityY(-jumpVelocity);
+        this.player.sprite.body.setVelocityY(-playerData.jumpVelocity);
 
         jumps--
       } else {
@@ -693,6 +695,14 @@ class playGame extends Phaser.Scene {
     if (item.type == 'Long Beam') {
       playerData.hasLong = true
       playerData.range = 900
+    }
+    if (item.type == 'Ice Beam') {
+      playerData.hasIce = true
+
+    }
+    if (item.type == 'High Jump') {
+      playerData.hasJump = true
+      playerData.jumpVelocity = 600
     }
   }
   collectObject(player, gameObject) {
@@ -1062,8 +1072,12 @@ class playGame extends Phaser.Scene {
 
   }
   hitEnemy(player, baddie) {
+    if (baddie.frozen) {
 
-    this.player.playerHit()
+    } else {
+      this.player.playerHit()
+    }
+
 
   }
   hitObject(player, object) {

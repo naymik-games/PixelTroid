@@ -145,22 +145,31 @@ let playerDataDefault = {
   hasBombs: false,
   coinCount: 0,
   missleCount: 0,
+  missleExpansion: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  tankCount: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   inRoom: 0,
   weapon: 'sword',
-  range: 300
+  range: 300,
+  jumpVelocity: 350
 }
 
 
 //power ups  invincible,            items roll
 let currentRoom = 0
 let enteredFrom = 'none'
+let areas = [
+  {
+    name: 'Surface',
+    doorFrames: []
+  }
+]
 let rooms = [
   {
     id: 0,
-    tileFile: 'surface_tiles',
-    tileKey: 'surface_tiles',
-    roomKey: 'area01-0',
-    background: 0x103050,
+    tileFile: 'metroid_tiles',
+    tileKey: 'metroid_tiles',
+    roomKey: 'area0-0',
+    background: 0x000000,
     leftID1: null,//room id connected to room
     leftID2: null,
     rightID1: 1,

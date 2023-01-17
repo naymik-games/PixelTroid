@@ -28,7 +28,7 @@ class UI extends Phaser.Scene {
     progressBar.fillRect(60, 35, 125 * value, 15)
     this.eText = this.add.text(25, 35, 'E', { fontFamily: 'PixelFont', fontSize: '50px', color: '#C6EFD8', align: 'left' }).setOrigin(.5)
 
-
+    this.itemsIcon = this.add.image(game.config.width - 132, 45, 'items', 0).setScale(2)
 
     this.coinIcon = this.add.image(game.config.width - 48, 45, 'coin', 0).setScale(2)
     this.coinCountText = this.add.text(game.config.width - 74, 35, '0', { fontFamily: 'PixelFont', fontSize: '50px', color: '#C6EFD8', align: 'left' }).setOrigin(1, .5)

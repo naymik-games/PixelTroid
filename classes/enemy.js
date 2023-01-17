@@ -24,7 +24,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
     this.previousX = this.x;
     this.strength = enemeyConfigs[kind].strength
-
+    this.frozen = false
     this.maxDistance = maxDistance
 
     this.anims.create({
@@ -50,6 +50,11 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
   preUpdate(time, delta) {
     super.preUpdate(time, delta);
+    if (this.frozen) {
+      this.scene.physics.add.collider(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    } else {
+      this.scene.physics.add.overlap(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    }
     if (this.kind == 0) {
       if (Math.abs(this.x - this.previousX) >= this.maxDistance) {
         this.toggleFlipX()
@@ -128,6 +133,18 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.strength -= damage
     if (this.strength > 0) {
       this.hit = false
+      if (playerData.hasIce) {
+        if (this.frozen) {
+          this.frozen = false
+          this.clearTint()
+        } else {
+          this.body.velocity.x = 0
+          this.body.velocity.y = 0
+          this.frozen = true
+          this.setTint(0x0000ff)
+        }
+
+      }
       var tween = this.scene.tweens.add({
         targets: this,
         alpha: 0.1,
@@ -169,7 +186,7 @@ const enemeyConfigs = [{
 },
 {
   //eneny 2 flies side to side
-  strength: 0,
+  strength: 2,
   key: 'enemy02',
   fr: 3
 },
@@ -182,7 +199,7 @@ const enemeyConfigs = [{
 
 {
   //Enemy4 attracked to player withing range
-  strength: 1,
+  strength: 2,
   key: 'enemy04',
   fr: 12
 },
@@ -213,7 +230,7 @@ const enemeyConfigs = [{
 
 {
   //Enemy9 flies down to ground towards payer when near
-  strength: 0,
+  strength: 6,
   key: 'enemy09',
   fr: 12
 }
