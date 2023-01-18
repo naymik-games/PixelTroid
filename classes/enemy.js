@@ -24,6 +24,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
     this.previousX = this.x;
     this.strength = enemeyConfigs[kind].strength
+    this.damage = enemeyConfigs[kind].damage
     this.frozen = false
     this.maxDistance = maxDistance
     this.saveXYV = { x: 0, y: 0 }
@@ -187,56 +188,65 @@ const enemeyConfigs = [{
   //enemy 1 walks side to side
   strength: 4,
   key: 'enemy01',
-  fr: 12
+  fr: 12,
+  damage: 5
 },
 {
   //eneny 2 flies side to side
   strength: 4,
   key: 'enemy02',
-  fr: 3
+  fr: 3,
+  damage: 5
 },
 
 {
   strength: 0,
   key: 'enemy03',
-  fr: 12
+  fr: 12,
+  damage: 5
 },
 
 {
   //Enemy4 attracked to player withing range
   strength: 2,
   key: 'enemy04',
-  fr: 12
+  fr: 12,
+  damage: 5
 },
 
 {
   strength: 0,
   key: 'enemy05',
-  fr: 6
+  fr: 6,
+  damage: 5
 },
 
 {
   strength: 0,
   key: 'enemy06',
-  fr: 6
+  fr: 6,
+  damage: 5
 },
 
 {
   strength: 0,
   key: 'enemy07',
-  fr: 6
+  fr: 6,
+  damage: 5
 },
 
 {
   strength: 0,
   key: 'enemy08',
-  fr: 6
+  fr: 6,
+  damage: 5
 },
 
 {
   //Enemy9 flies down to ground towards payer when near
   strength: 6,
   key: 'enemy09',
-  fr: 12
+  fr: 12,
+  damage: 7
 }
 ]

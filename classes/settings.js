@@ -87,7 +87,7 @@ let layer,
   doors,
   bombRadius,
   lava,
-  bulletSpeed = 250,
+  bulletSpeed = 350,
   shellSpeed = 200,
   wasStanding = false,
   edgeTimer = 0,
@@ -150,7 +150,9 @@ let playerDataDefault = {
   inRoom: 0,
   weapon: 'sword',
   range: 300,
-  jumpVelocity: 350
+  jumpVelocity: 350,
+  numExtraJumbs: 0,
+  damageMultiplier: 2,
 }
 
 
@@ -166,10 +168,10 @@ let areas = [
 let rooms = [
   {
     id: 0,
-    tileFile: 'surface_tiles',
-    tileKey: 'surface_tiles',
+    tileFile: 'metroid_tiles',
+    tileKey: 'metroid_tiles',
     roomKey: 'area0-0',
-    background: 0x0C243D,
+    background: 0x000000,
     leftID1: null,//room id connected to room
     leftID2: null,
     rightID1: 1,

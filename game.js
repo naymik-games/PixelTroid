@@ -200,7 +200,6 @@ class playGame extends Phaser.Scene {
     this.physics.add.overlap(this.player.sprite, lava, this.hitObject, null, this);
     this.physics.add.collider(this.player.sprite, sparks, this.hitObject, null, this);
     this.physics.add.collider(this.player.sprite, lavaBall, this.playerHitLavaBall, null, this);
-
     this.physics.add.overlap(this.player.sprite, beams, this.hitObject, null, this);
     //player weapons
     this.physics.add.overlap(this.player.swordHitBox, enemies, this.swordHitEnemy, null, this);
@@ -506,7 +505,7 @@ class playGame extends Phaser.Scene {
         jumping = false;
         touchJump = false;
         prevPos = 0;
-        jumps = 1
+        jumps = playerData.numExtraJumbs
       }
 
     }
@@ -703,7 +702,8 @@ class playGame extends Phaser.Scene {
     }
     if (item.type == 'High Jump') {
       playerData.hasJump = true
-      playerData.jumpVelocity = 600
+      playerData.jumpVelocity = 500
+      playerData.numExtraJumbs = 1
     }
     if (item.type == 'Morph') {
       playerData.hasMorph = true
@@ -711,6 +711,11 @@ class playGame extends Phaser.Scene {
     }
     if (item.type == 'Bombs') {
       playerData.hasBombs = true
+
+    }
+    if (item.type == 'Power Suit') {
+      playerData.hasPower = true
+      playerData.damageMultiplier = 1
 
     }
   }
@@ -1081,21 +1086,22 @@ class playGame extends Phaser.Scene {
 
   }
   hitEnemy(player, baddie) {
+
     if (baddie.frozen) {
 
     } else {
-      this.player.playerHit()
+      this.player.playerHit(baddie.damage)
     }
 
 
   }
   hitObject(player, object) {
-    this.player.playerHit()
+    this.player.playerHit(object.damage)
   }
   playerHitLavaBall(player, ball) {
     lavaBall.killAndHide(ball)
     ball.setPosition(-50, -50)
-    this.player.playerHit(player, ball)
+    this.player.playerHit(ball.damage)
   }
 
 
@@ -1505,6 +1511,7 @@ class playGame extends Phaser.Scene {
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].y += (this.map.tileHeight / 2)
+      sprites[i].damage = 3
       spikes.add(sprites[i])
     }
   }
@@ -1514,6 +1521,7 @@ class playGame extends Phaser.Scene {
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].y += (this.map.tileHeight / 2)
+      sprites[i].damage = 5
       lava.add(sprites[i])
     }
   }
@@ -1530,6 +1538,7 @@ class playGame extends Phaser.Scene {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].y += (this.map.tileHeight / 2)
       sprites[i].setDepth(3)
+      sprites[i].damage = 4
       sparks.add(sprites[i])
 
     }
@@ -1552,6 +1561,7 @@ class playGame extends Phaser.Scene {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].y += (this.map.tileHeight / 2)
       sprites[i].setDepth(3)
+      sprites[i].damage = 6
       beams.add(sprites[i])
 
     }
@@ -1688,6 +1698,7 @@ class playGame extends Phaser.Scene {
     bomb.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
     bomb.x = box.x;
     bomb.y = box.y;
+    bomb.damage = 10
     bomb.body.velocity.y = 100;
   }
   buildTouchSlider() {

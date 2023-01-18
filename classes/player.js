@@ -219,7 +219,7 @@ class Player {
     bullets.killAndHide(bullet)
     bullet.setPosition(-50, -50)
   }
-  playerHit(player, spike) {
+  playerHit(damage) {
 
     //if you are not already invulnerable
     if (!this.invulnerable && !this.invincible) {
@@ -230,7 +230,7 @@ class Player {
 
 
       //remove a heart from out count stored on the player object
-      playerData.health -= 10;
+      playerData.health -= damage * playerData.damageMultiplier;
       this.scene.addScore()
       //if hearts is 0 or less you're dead as you are out of lives
       if (playerData.health <= 0) {
