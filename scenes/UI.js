@@ -1,3 +1,4 @@
+var progressBox, progressBar;
 class UI extends Phaser.Scene {
 
   constructor() {
@@ -13,20 +14,28 @@ class UI extends Phaser.Scene {
 
   }
   create() {
-
+    this.tanks = []
     this.header = this.add.image(game.config.width / 2, 0, 'blank').setOrigin(.5, 0).setTint(0x000000);//0x262626
     this.header.displayWidth = game.config.width;
     this.header.displayHeight = 125;
     var value = 1
-    var progressBox = this.add.graphics();
-    var progressBar = this.add.graphics();
+    progressBox = this.add.graphics();
+
 
     progressBox.fillStyle(0x454545, .8);
     progressBox.fillRect(50, 25, 150, 35);
+
+    this.progressBox = this.add.image(50, 25, 'progressBox').setScale(1).setOrigin(0)
+    progressBar = this.add.graphics();
     progressBar.clear()
     progressBar.fillStyle(0x00ff00, 1);
-    progressBar.fillRect(60, 35, 125 * value, 15)
+    progressBar.fillRect(55, 35, 140 * value, 15)
     this.eText = this.add.text(25, 35, 'E', { fontFamily: 'PixelFont', fontSize: '50px', color: '#fafafa', align: 'left' }).setOrigin(.5)//C6EFD8
+
+    this.messageText = this.add.text(25, 65, 'Acquired Power Suit', { fontFamily: 'PixelFont', fontSize: '40px', color: '#fafafa', align: 'left' }).setOrigin(0)//C6EFD8
+
+    //this.tankIcon = this.add.image(225, 45, 'tankUI', 1).setScale(1)
+    let tankIconTest = this.add.image(215, 45, 'tankUI', 0).setScale(1).setOrigin(.5, 0)
 
     this.itemsIcon = this.add.image(game.config.width - 132, 45, 'items', 0).setScale(2)
 
@@ -71,13 +80,92 @@ class UI extends Phaser.Scene {
     this.yButton.on('pointerup', this.doYDone, this);
 
 
-    this.Main.events.on('score', function () {
+    this.Main.events.on('message', function (item) {
+      this.messageText.setText('Aquired ' + item)
 
-      var health = playerData.health
-      var value = health / 100
-      progressBar.clear()
-      progressBar.fillStyle(0x00ff00, 1);
-      progressBar.fillRect(60, 35, 125 * value, 15)
+      var t = this.tweens.add({
+        targets: this.messageText,
+        alpha: 1,
+        delay: 2000,
+        duration: 300,
+        onCompleteScope: this,
+        onComplete: function () {
+          var t1 = this.tweens.add({
+            targets: this.messageText,
+            alpha: 0,
+            delay: 2000,
+            duration: 300
+          })
+        }
+      })
+
+
+
+    }, this);
+
+    this.Main.events.on('tank', function (index) {
+      this.addTank(index)
+    }, this);
+
+    this.Main.events.on('score', function (amount) {
+
+      if (Math.sign(amount) == -1) {//losing health
+
+        if (playerData.health + amount < 1) { //if new health less than zero
+          let tanksIndex = this.getFirstFull()
+          if (tanksIndex == -1) {
+            playerData.health += amount //no full tanks return back and process death
+            return
+          }
+          // otherwise, empty tank,fill health and subtract remaining damage
+          this.tanks[tanksIndex].state = 1
+          this.tanks[tanksIndex].setFrame(1)
+          var temp = this.tanks[tanksIndex].index
+          playerData.tankCount[temp] = 1
+          var leftOver = Math.abs(amount + playerData.health)
+          playerData.health = 100 - leftOver
+          this.updateHealthBar()
+          var t = this.tweens.add({
+            targets: this.tanks[tanksIndex],
+            scale: 0,
+            yoyo: true,
+            duration: 100
+          })
+          // tankCount: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0 don't have, 1 empth, 2 full
+        } else { //lose health but not less than zero, deduct and move on
+          playerData.health += amount
+          this.updateHealthBar()
+        }
+      } else {//gain health
+        if (playerData.health + amount > 100) {//move 100 health to tank
+          // tankCount: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 0 don't have, 1 empth, 2 full
+          let tanksIndex = this.getFirstEmpty()
+          if (tanksIndex == -1) {
+            playerData.health = 100 //no empty tanks just max out health and move on
+            this.updateHealthBar()
+            return
+          }
+          this.tanks[tanksIndex].state = 2
+          this.tanks[tanksIndex].setFrame(0)
+          var temp = this.tanks[tanksIndex].index
+          playerData.tankCount[temp] = 2
+          var extra = (amount + playerData.health) - 100
+          playerData.health = extra
+          this.updateHealthBar()
+          var t = this.tweens.add({
+            targets: this.tanks[tanksIndex],
+            scale: 2,
+            yoyo: true,
+            duration: 100
+          })
+        } else {//other wise add health and move on
+          playerData.health += amount
+          this.updateHealthBar()
+        }
+      }
+
+
+
     }, this);
     this.Main.events.on('coin', function () {
       this.coinCountText.setText(this.Main.player.coinCount)
@@ -98,6 +186,46 @@ class UI extends Phaser.Scene {
 
   update() {
 
+  }
+  updateHealthBar() {
+    var health = playerData.health
+    var value = health / 100
+    progressBar.clear()
+    progressBar.fillStyle(0x00ff00, 1);
+    progressBar.fillRect(55, 32.5, 140 * value, 20)
+  }
+  addTank(index) {
+    let tankIcon = this.add.image(215, 25, 'tankUI', 0).setScale(1).setOrigin(.5, 0)
+    tankIcon.index = index
+    tankIcon.state = 2
+    playerData.tankCount[index] = 2
+    this.tanks.push(tankIcon)
+
+  }
+  getFirstFull() {
+    for (var i = this.tanks.length - 1; i > -1; i--) {
+      if (this.tanks[i].state == 2) {
+        return i
+      }
+    }
+    return -1
+  }
+  getFirstEmpty() {
+    for (var i = this.tanks.length - 1; i > -1; i--) {
+      if (this.tanks[i].state == 1) {
+        return i
+      }
+    }
+    return -1
+  }
+  countEmpty() {
+    let counter = 0;
+    for (state of playerData.tankCount) {
+      if (state == 1) {
+        counter++;
+      }
+    };
+    return counter
   }
   doA() {
 

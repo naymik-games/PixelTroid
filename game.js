@@ -50,10 +50,10 @@ class playGame extends Phaser.Scene {
 
     this.map = this.make.tilemap({ key: rooms[currentRoom].roomKey });
     this.tiles = this.map.addTilesetImage(rooms[currentRoom].tileFile, rooms[currentRoom].tileKey);
-
+    const layerDec = this.map.createLayer('layer1', this.tiles);
     layer = this.map.createLayer('layer0', this.tiles);
 
-    const layerDec = this.map.createLayer('layer1', this.tiles);
+
 
     // const layer2 = map2.createLayer(0, tiles, 0, 0);
     layer.setCollisionByExclusion([-1, questionFrame, collapseFrame, oneWayFrame, spikeFrame, boxFrame, pushableFrame, sparkFrame, beamFrame, reappearFrame, lavaFrame]);
@@ -85,17 +85,17 @@ class playGame extends Phaser.Scene {
       //yoyo: true,
       repeat: -1
     });
-    this.anims.create({
-      key: "bullet-fired",
-      frames: this.anims.generateFrameNumbers("bullet", {
-        start: 0,
-        end: 3
-      }),
-      frameRate: 12,
-      //yoyo: true,
-      repeat: -1
-    });
-
+    /*  this.anims.create({
+       key: "bullet-fired",
+       frames: this.anims.generateFrameNumbers("bullet", {
+         start: 0,
+         end: 3
+       }),
+       frameRate: 12,
+       //yoyo: true,
+       repeat: -1
+     });
+  */
     this.anims.create({
       key: 'effect-explode',
       frames: 'explode',
@@ -161,6 +161,7 @@ class playGame extends Phaser.Scene {
     this.createHPlatforms()
     this.createEnemies()
     this.createItems()
+    this.createTanks()
 
 
     //camera and cursors
@@ -212,7 +213,7 @@ class playGame extends Phaser.Scene {
     this.physics.world.addCollider(bombRadius, reappearingBlocks, this.bombHitReappear, null, this);
     this.physics.world.addCollider(bombRadius, doors, this.bulletHitDoor, null, this);
 
-    this.physics.world.addCollider(bullets, layer);
+    this.physics.world.addCollider(bullets, layer, this.bulletHitLayer, null, this);
     this.physics.world.addCollider(bullets, boxes, this.bulletHitBox, null, this);
     this.physics.world.addCollider(bullets, reappearingBlocks, this.bulletHitReappear, null, this);
     this.physics.world.addCollider(bullets, enemies, this.bulletHitEnemy, null, this);
@@ -256,6 +257,7 @@ class playGame extends Phaser.Scene {
   }
   ///update
   update() {
+    this.player.update()
     //built in arcade physics functions of blocked and touching to test for collisions in a given direction
     standing = this.player.sprite.body.blocked.down || this.player.sprite.body.touching.down,
       //get current time in seconds
@@ -674,6 +676,7 @@ class playGame extends Phaser.Scene {
     setTimeout(() => {
       this.scene.resume();
     }, 1500);
+    this.sendMessage(item.type)
     var tween = this.tweens.add({
       targets: item,
       alpha: 0.3,
@@ -694,7 +697,7 @@ class playGame extends Phaser.Scene {
     }
     if (item.type == 'Long Beam') {
       playerData.hasLong = true
-      playerData.range = 900
+      playerData.range = 400
     }
     if (item.type == 'Ice Beam') {
       playerData.hasIce = true
@@ -718,6 +721,10 @@ class playGame extends Phaser.Scene {
       playerData.damageMultiplier = 1
 
     }
+    if (item.type == 'Energy Tank') {
+      playerData.tankCount[item.index] = 1
+      this.addTank(item.index)
+    }
   }
   collectObject(player, gameObject) {
     //stop coin for being collected twice, as it will stick around on the screen as it animnates
@@ -727,8 +734,8 @@ class playGame extends Phaser.Scene {
       this.updateCoin()
     }
     if (gameObject.type == 'pellet') {
-      playerData.health += gameObject.amount
-      this.addScore()
+      //playerData.health += gameObject.amount
+      this.addScore(gameObject.amount)
     }
     if (gameObject.type == 'missle') {
       playerData.missleCount += gameObject.amount
@@ -934,6 +941,9 @@ class playGame extends Phaser.Scene {
     if (block.body.blocked.right || block.body.blocked.right) {
       block.body.setImmovable(true)
     }
+  }
+  bulletHitLayer(bullet, layer) {
+    this.player.killBullet(bullet)
   }
   bulletHitDoor(bullet, door) {
     //effect-door-left-close
@@ -1258,6 +1268,18 @@ class playGame extends Phaser.Scene {
     }
 
   }
+  createTanks() {
+    //tanks = this.physics.add.group({ allowGravity: false });
+    for (var i = 0; i < this.thinglayer.length; i++) {
+      if (this.thinglayer[i].name == 'Energy Tank 01' && playerData.tankCount[0] == 0) {
+        var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
+        var tank = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 8)//99
+        tank.type = 'Energy Tank'
+        tank.index = 0
+        tank.setOrigin(.5, .5);
+      }
+    }
+  }
   createItems() {
     //'Beam', 'LongBeam', 'IceBeam', 'HighJump', 'PowerSuit', 'Morph', 'Bombs', 'MissleSupply', 'EnergyTank'
     items = this.physics.add.group({ allowGravity: false });
@@ -1574,14 +1596,14 @@ class playGame extends Phaser.Scene {
   createDoors(layer) {
     this.anims.create({
       key: 'effect-door-right',
-      frames: this.anims.generateFrameNumbers("door", { start: 0, end: 3 }),
-      frameRate: 14,
+      frames: this.anims.generateFrameNumbers("door", { start: 0, end: 4 }),
+      frameRate: 20,
       repeat: 0
     });
     this.anims.create({
       key: 'effect-door-right-close',
-      frames: this.anims.generateFrameNumbers("door", { frames: [3, 2, 1, 0] }),
-      frameRate: 14,
+      frames: this.anims.generateFrameNumbers("door", { frames: [4, 3, 2, 1, 0] }),
+      frameRate: 20,
       repeat: 0
     });
     doors = this.physics.add.group({ allowGravity: false, immovable: true });
@@ -1605,18 +1627,18 @@ class playGame extends Phaser.Scene {
     }
     this.anims.create({
       key: 'effect-door-left',
-      frames: this.anims.generateFrameNumbers("door", { start: 4, end: 7 }),
-      frameRate: 14,
+      frames: this.anims.generateFrameNumbers("door", { frames: [9, 8, 7, 6, 5] }),
+      frameRate: 20,
       repeat: 0
     });
     this.anims.create({
       key: 'effect-door-left-close',
-      frames: this.anims.generateFrameNumbers("door", { frames: [7, 6, 5, 4] }),
-      frameRate: 14,
+      frames: this.anims.generateFrameNumbers("door", { start: 5, end: 9 }),
+      frameRate: 20,
       repeat: 0
     });
     //left door 1
-    var sprites = this.map.createFromTiles(doorL1Frame, 0, { key: 'door', frame: 4 }, null, null, layer)
+    var sprites = this.map.createFromTiles(doorL1Frame, 0, { key: 'door', frame: 9 }, null, null, layer)
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].direction = 'left1'
@@ -1625,7 +1647,7 @@ class playGame extends Phaser.Scene {
       doors.add(sprites[i])
     }
     //left door 2
-    var sprites = this.map.createFromTiles(doorL2Frame, 0, { key: 'door', frame: 4 }, null, null, layer)
+    var sprites = this.map.createFromTiles(doorL2Frame, 0, { key: 'door', frame: 9 }, null, null, layer)
     for (var i = 0; i < sprites.length; i++) {
       sprites[i].x += (this.map.tileWidth / 2)
       sprites[i].direction = 'left2'
@@ -1755,11 +1777,17 @@ class playGame extends Phaser.Scene {
 
     }, this);
   }
-  addScore() {
-    this.events.emit('score');
+  addScore(amount) {
+    this.events.emit('score', amount);
   }
-  addItem(item) {
-    this.events.emit('item', item);
+  addTank(index) {
+    this.events.emit('tank', index);
+  }
+  /*   addItem(item) {
+      this.events.emit('item', item);
+    } */
+  sendMessage(item) {
+    this.events.emit('message', item);
   }
   updateCoin() {
     this.events.emit('coin');

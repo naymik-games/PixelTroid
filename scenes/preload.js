@@ -185,8 +185,8 @@ class preloadGame extends Phaser.Scene {
       frameHeight: 48
     });
     this.load.spritesheet('bullet', 'assets/sprites/bullet.png', {
-      frameWidth: 16,
-      frameHeight: 16
+      frameWidth: 8,
+      frameHeight: 8
     });
     this.load.spritesheet('pellet', 'assets/sprites/pellet.png', {
       frameWidth: 16,
@@ -202,8 +202,14 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 32
     });
+    this.load.spritesheet('tankUI', 'assets/sprites/tankUI.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+      margin: 1,
+      spacing: 1
+    });
     this.load.image('platform', 'assets/sprites/platform.png')
-
+    this.load.image('progressBox', 'assets/sprites/progressBox.png')
     this.load.image('aButton', 'assets/controls/a_button.png')
     this.load.image('cross', 'assets/controls/dpad.png');
     this.load.image('blank', 'assets/sprites/blank.png');

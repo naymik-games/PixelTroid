@@ -115,7 +115,7 @@ class Player {
 
   update() {
 
-
+    bullets.getChildren().forEach(this.updateBullet, this);
 
 
   }
@@ -129,6 +129,14 @@ class Player {
 
     } else {
       this.smash()
+    }
+  }
+  updateBullet(bullet) {
+    bullet.state -= bullet.body.newVelocity.length();
+
+    if (bullet.state <= 0) {
+      //bullet.disableBody(true, true);
+      this.killBullet(bullet)
     }
   }
   setBomb() {
@@ -198,10 +206,11 @@ class Player {
         console.log('shoot')
         // Place the explosion on the screen, and play the animation.
         bullet.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
-        bullet.setSize(8, 16).setOffset(8, 4)
+        //bullet.setSize(8, 8).setOffset(8, 4)
         bullet.x = this.sprite.x;
-        bullet.y = this.sprite.y - 5;
-        bullet.play('bullet-fired')
+        bullet.y = this.sprite.y - 0;
+        bullet.state = playerData.range
+        //bullet.play('bullet-fired')
         if (this.sprite.flipX) {
           bullet.body.setVelocityX(-bulletSpeed)
         } else {
@@ -210,7 +219,7 @@ class Player {
         var timer = this.scene.time.delayedCall(150, function () {
           this.canShoot = true
         }, null, this);
-        var timer2 = this.scene.time.delayedCall(playerData.range, this.killBullet, [bullet], this);
+        // var timer2 = this.scene.time.delayedCall(playerData.range, this.killBullet, [bullet], this);
       }
 
     }
@@ -230,8 +239,8 @@ class Player {
 
 
       //remove a heart from out count stored on the player object
-      playerData.health -= damage * playerData.damageMultiplier;
-      this.scene.addScore()
+      // playerData.health -= damage * playerData.damageMultiplier;
+      this.scene.addScore(-damage * playerData.damageMultiplier)
       //if hearts is 0 or less you're dead as you are out of lives
       if (playerData.health <= 0) {
         //remove physics from player
