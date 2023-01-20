@@ -94,7 +94,7 @@ class Player {
     this.isAttack = false
     this.roll = false
     this.bombSet = false
-
+    this.missleActive = false
     //this.weapon = 'gun'
     this.canShoot = true
     this.isJumping = false
@@ -207,13 +207,20 @@ class Player {
         // Place the explosion on the screen, and play the animation.
         bullet.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
         //bullet.setSize(8, 8).setOffset(8, 4)
+        if (this.missleActive) {
+          bullet.setTexture('missle')
+        } else {
+          bullet.setTexture('bullet')
+        }
         bullet.x = this.sprite.x;
         bullet.y = this.sprite.y - 0;
         bullet.state = playerData.range
         //bullet.play('bullet-fired')
         if (this.sprite.flipX) {
+          bullet.setFlipX(true);
           bullet.body.setVelocityX(-bulletSpeed)
         } else {
+          bullet.setFlipX(false);
           bullet.body.setVelocityX(bulletSpeed)
         }
         var timer = this.scene.time.delayedCall(150, function () {

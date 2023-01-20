@@ -162,7 +162,7 @@ class playGame extends Phaser.Scene {
     this.createEnemies()
     this.createItems()
     this.createTanks()
-
+    this.createMissles()
 
     //camera and cursors
 
@@ -725,6 +725,15 @@ class playGame extends Phaser.Scene {
       playerData.tankCount[item.index] = 1
       this.addTank(item.index)
     }
+    if (item.type == 'Missle Supply') {
+      playerData.missleExpansion[item.index] = 1
+      if (!playerData.hasMissle) {
+        playerData.hasMissle = true
+        this.addMissleFirst()
+      }
+      this.addMissle()
+      //this.addTank(item.index)
+    }
   }
   collectObject(player, gameObject) {
     //stop coin for being collected twice, as it will stick around on the screen as it animnates
@@ -738,8 +747,14 @@ class playGame extends Phaser.Scene {
       this.addScore(gameObject.amount)
     }
     if (gameObject.type == 'missle') {
-      playerData.missleCount += gameObject.amount
-      //this.addScore()
+      if (playerData.missleCount + gameObject.amount > playerData.missleCapacity) {
+        playerData.missleCount = playerData.missleCapacity
+        this.collectMissle()
+      } else {
+        playerData.missleCount += gameObject.amount
+        this.collectMissle()
+      }
+
     }
     if (gameObject.type == 'Key') {
       this.player.hasKey = true
@@ -826,7 +841,11 @@ class playGame extends Phaser.Scene {
     if (!bad.hit) {
       // set baddie as being hit and remove physics
       bad.hit = true
-      bad.enemyHit(1)
+      var damage = 1
+      if (this.player.missleActive) {
+        damage = 5
+      }
+      bad.enemyHit(damage)
     }
   }
   bombHitEnemy(bombHit, bad) {
@@ -1236,9 +1255,16 @@ class playGame extends Phaser.Scene {
       pellet.amount = 10
       pellet.type = 'pellet'
     } else {
-      pellet.setFrame(2)
-      pellet.amount = 5
-      pellet.type = 'missle'
+      if (playerData.hasMissle) {
+        pellet.setFrame(2)
+        pellet.amount = 5
+        pellet.type = 'missle'
+      } else {
+        pellet.setFrame(0)
+        pellet.amount = 3
+        pellet.type = 'pellet'
+      }
+
     }
 
 
@@ -1275,6 +1301,18 @@ class playGame extends Phaser.Scene {
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
         var tank = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 8)//99
         tank.type = 'Energy Tank'
+        tank.index = 0
+        tank.setOrigin(.5, .5);
+      }
+    }
+  }
+  createMissles() {
+    //tanks = this.physics.add.group({ allowGravity: false });
+    for (var i = 0; i < this.thinglayer.length; i++) {
+      if (this.thinglayer[i].name == 'Missle Supply 01' && playerData.missleExpansion[0] == 0) {
+        var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
+        var tank = items.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'items', 7)//99
+        tank.type = 'Missle Supply'
         tank.index = 0
         tank.setOrigin(.5, .5);
       }
@@ -1779,6 +1817,15 @@ class playGame extends Phaser.Scene {
   }
   addScore(amount) {
     this.events.emit('score', amount);
+  }
+  addMissle() {
+    this.events.emit('missle');
+  }
+  addMissleFirst() {
+    this.events.emit('missleFirst');
+  }
+  collectMissle() {
+    this.events.emit('collectMissle');
   }
   addTank(index) {
     this.events.emit('tank', index);

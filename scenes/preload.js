@@ -202,6 +202,10 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 32
     });
+    this.load.spritesheet('missle_icons', 'assets/sprites/missle_icons.png', {
+      frameWidth: 16,
+      frameHeight: 16
+    });
     this.load.spritesheet('tankUI', 'assets/sprites/tankUI.png', {
       frameWidth: 16,
       frameHeight: 16,
@@ -209,6 +213,7 @@ class preloadGame extends Phaser.Scene {
       spacing: 1
     });
     this.load.image('platform', 'assets/sprites/platform.png')
+    this.load.image('missle', 'assets/sprites/missle.png')
     this.load.image('progressBox', 'assets/sprites/progressBox.png')
     this.load.image('aButton', 'assets/controls/a_button.png')
     this.load.image('cross', 'assets/controls/dpad.png');

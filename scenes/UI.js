@@ -15,6 +15,7 @@ class UI extends Phaser.Scene {
   }
   create() {
     this.tanks = []
+
     this.header = this.add.image(game.config.width / 2, 0, 'blank').setOrigin(.5, 0).setTint(0x000000);//0x262626
     this.header.displayWidth = game.config.width;
     this.header.displayHeight = 125;
@@ -35,9 +36,11 @@ class UI extends Phaser.Scene {
     this.messageText = this.add.text(25, 65, 'Acquired Power Suit', { fontFamily: 'PixelFont', fontSize: '40px', color: '#fafafa', align: 'left' }).setOrigin(0)//C6EFD8
 
     //this.tankIcon = this.add.image(225, 45, 'tankUI', 1).setScale(1)
-    let tankIconTest = this.add.image(215, 45, 'tankUI', 0).setScale(1).setOrigin(.5, 0)
 
-    this.itemsIcon = this.add.image(game.config.width - 132, 45, 'items', 0).setScale(2)
+    this.setTanks()
+    this.missleIcon = this.add.image(game.config.width - 150, 45, 'missle_icons', 0).setScale(2).setAlpha(0)
+    this.missleCountText = this.add.text(game.config.width - 150, 75, '0', { fontFamily: 'PixelFont', fontSize: '40px', color: '#C6EFD8', align: 'left' }).setOrigin(.5).setAlpha(0)
+
 
     this.coinIcon = this.add.image(game.config.width - 48, 45, 'coin', 0).setScale(2)
     this.coinCountText = this.add.text(game.config.width - 74, 35, '0', { fontFamily: 'PixelFont', fontSize: '50px', color: '#C6EFD8', align: 'left' }).setOrigin(1, .5)
@@ -80,6 +83,8 @@ class UI extends Phaser.Scene {
     this.yButton.on('pointerup', this.doYDone, this);
 
 
+    //this.sButton.on('pointerup', this.doYDone, this);
+
     this.Main.events.on('message', function (item) {
       this.messageText.setText('Aquired ' + item)
 
@@ -106,7 +111,21 @@ class UI extends Phaser.Scene {
     this.Main.events.on('tank', function (index) {
       this.addTank(index)
     }, this);
+    this.Main.events.on('missle', function () {
+      playerData.missleCount += 10
+      playerData.missleCapacity += 10
+      this.updateCapacityText()
+    }, this);
+    this.Main.events.on('collectMissle', function () {
 
+      this.updateCapacityText()
+    }, this);
+    this.Main.events.on('missleFirst', function () {
+      this.missleIcon.setAlpha(1)
+      this.missleCountText.setAlpha(1)
+      this.sButton = this.add.image(game.config.width - 525, this.controlsY + 25, "controller_buttons", 12).setScale(6).setInteractive();
+      this.sButton.on('pointerdown', this.doS, this);
+    }, this);
     this.Main.events.on('score', function (amount) {
 
       if (Math.sign(amount) == -1) {//losing health
@@ -195,12 +214,55 @@ class UI extends Phaser.Scene {
     progressBar.fillRect(55, 32.5, 140 * value, 20)
   }
   addTank(index) {
-    let tankIcon = this.add.image(215, 25, 'tankUI', 0).setScale(1).setOrigin(.5, 0)
+    var x = 0
+    var y = 0
+    if (this.tanks.length < 5) {
+      x = this.tanks.length
+      y = 0
+    } else {
+      x = this.tanks.length - 5
+      y = 1
+    }
+    let tankIcon = this.add.image(215 + x * 20, 25 + y * 20, 'tankUI', 0).setScale(1).setOrigin(.5, 0)
     tankIcon.index = index
     tankIcon.state = 2
     playerData.tankCount[index] = 2
     this.tanks.push(tankIcon)
+    /*   let tankIcon = this.add.image(215 + 0 * 20, 25, 'tankUI', 0).setScale(1).setOrigin(.5, 0)
+      let tankIcon1 = this.add.image(215 + 1 * 20, 25, 'tankUI', 0).setScale(1).setOrigin(.5, 0)
+      let tankIcon2 = this.add.image(215 + 2 * 20, 25, 'tankUI', 0).setScale(1).setOrigin(.5, 0)
+      let tankIconTest = this.add.image(215, 45, 'tankUI', 0).setScale(1).setOrigin(.5, 0) */
 
+  }
+  setTanks() {
+    var counter = 0
+    for (var i = 0; i < playerData.tankCount.length; i++) {
+      var x = 0
+      var y = 0
+
+      if (playerData.tankCount[i] > 0) {
+        if (counter < 5) {
+          x = counter
+          y = 0
+        } else {
+          x = counter - 5
+          y = 1
+        }
+
+
+        if (playerData.tankCount[i] == 1) {
+          var frame = 1
+        } else if (playerData.tankCount[i] == 2) {
+          var frame = 0
+        }
+        let tankIcon = this.add.image(215 + x * 20, 25 + y * 20, 'tankUI', frame).setScale(1).setOrigin(.5, 0)
+        tankIcon.index = i
+        tankIcon.state = playerData.tankCount[i]
+        this.tanks.push(tankIcon)
+        counter++
+      }
+
+    }
   }
   getFirstFull() {
     for (var i = this.tanks.length - 1; i > -1; i--) {
@@ -226,6 +288,18 @@ class UI extends Phaser.Scene {
       }
     };
     return counter
+  }
+  countAll() {
+    let counter = 0;
+    for (var i = 0; i < playerData.tankCount.length; i++) {
+      if (playerData.tankCount[i] > 0) {
+        counter++;
+      }
+    };
+    return counter
+  }
+  updateCapacityText() {
+    this.missleCountText.setText(playerData.missleCount + '/' + playerData.missleCapacity)
   }
   doA() {
 
@@ -279,7 +353,19 @@ class UI extends Phaser.Scene {
     // this.main.game.events.emit(EVENTS_NAME.attack);
     // this.main.game.events.emit(EVENTS_NAME.smash);
   }
+  doS() {
+    if (!playerData.hasMissle) { return }
+    if (this.Main.player.missleActive) {
+      this.Main.player.missleActive = false
+      this.missleIcon.setFrame(0)
+    } else {
+      this.Main.player.missleActive = true
+      this.missleIcon.setFrame(1)
+    }
 
+    // this.main.game.events.emit(EVENTS_NAME.attack);
+    // this.main.game.events.emit(EVENTS_NAME.smash);
+  }
   joyStickState() {
     var cursorKeys = this.joyStick.createCursorKeys();
     console.log(cursorKeys.right.isDown)
