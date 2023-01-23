@@ -92,6 +92,12 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 100,
       frameHeight: 100
     });
+    this.load.spritesheet("area1_tiles", "assets/sprites/area1_tiles.png", {
+      frameWidth: 16,
+      frameHeight: 16,
+      margin: 1,
+      spacing: 1
+    });
     this.load.spritesheet("metroid_tiles", "assets/sprites/metroid_tiles.png", {
       frameWidth: 16,
       frameHeight: 16,
@@ -207,6 +213,12 @@ class preloadGame extends Phaser.Scene {
       frameHeight: 16
     });
     this.load.spritesheet('tankUI', 'assets/sprites/tankUI.png', {
+      frameWidth: 16,
+      frameHeight: 16,
+      margin: 1,
+      spacing: 1
+    });
+    this.load.spritesheet('artifacts', 'assets/sprites/artifacts.png', {
       frameWidth: 16,
       frameHeight: 16,
       margin: 1,

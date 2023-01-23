@@ -150,6 +150,7 @@ let playerDataDefault = {
   missleCapacity: 0,
   missleExpansion: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   tankCount: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  artifacts: [],
   inRoom: 0,
   weapon: 'sword',
   range: 125,
@@ -171,10 +172,10 @@ let areas = [
 let rooms = [
   {
     id: 0,
-    tileFile: 'metroid_tiles',
-    tileKey: 'metroid_tiles',
+    tileFile: 'area1_tiles',
+    tileKey: 'area1_tiles',
     roomKey: 'area0-0',
-    background: 0x000000,
+    background: 0x2b2b26,
     leftID1: null,//room id connected to room
     leftID2: null,
     rightID1: 1,

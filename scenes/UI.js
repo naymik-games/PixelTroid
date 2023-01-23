@@ -43,7 +43,7 @@ class UI extends Phaser.Scene {
 
 
     this.coinIcon = this.add.image(game.config.width - 48, 45, 'coin', 0).setScale(2)
-    this.coinCountText = this.add.text(game.config.width - 74, 35, '0', { fontFamily: 'PixelFont', fontSize: '50px', color: '#C6EFD8', align: 'left' }).setOrigin(1, .5)
+    this.coinCountText = this.add.text(game.config.width - 74, 35, playerData.coinCount, { fontFamily: 'PixelFont', fontSize: '50px', color: '#C6EFD8', align: 'left' }).setOrigin(1, .5)
 
     this.keyIcon = this.add.image(game.config.width - 48, 100, rooms[currentRoom].tileKey, keyFrame).setScale(3).setAlpha(0)
     this.Main = this.scene.get('playGame');
@@ -110,6 +110,9 @@ class UI extends Phaser.Scene {
 
     this.Main.events.on('tank', function (index) {
       this.addTank(index)
+    }, this);
+    this.Main.events.on('misslecount', function () {
+      this.updateCapacityText()
     }, this);
     this.Main.events.on('missle', function () {
       playerData.missleCount += 10
@@ -187,7 +190,7 @@ class UI extends Phaser.Scene {
 
     }, this);
     this.Main.events.on('coin', function () {
-      this.coinCountText.setText(this.Main.player.coinCount)
+      this.coinCountText.setText(playerData.coinCount)
 
     }, this);
     this.Main.events.on('key', function () {

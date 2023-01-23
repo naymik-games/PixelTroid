@@ -197,7 +197,9 @@ class Player {
 
   }
   shoot() {
-
+    if (this.missleActive && playerData.missleCount < 1) {
+      return
+    }
     if (bullets.maxSize - bullets.getTotalUsed() > 0) {
       if (this.canShoot) {
         this.canShoot = false
@@ -208,10 +210,14 @@ class Player {
         bullet.setOrigin(0.5, 0.5).setScale(1).setDepth(3).setVisible(true);
         //bullet.setSize(8, 8).setOffset(8, 4)
         if (this.missleActive) {
+
           bullet.setTexture('missle')
+          playerData.missleCount--
+          this.scene.updateMissle()
         } else {
           bullet.setTexture('bullet')
         }
+
         bullet.x = this.sprite.x;
         bullet.y = this.sprite.y - 0;
         bullet.state = playerData.range

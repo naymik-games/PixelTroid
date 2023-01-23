@@ -739,7 +739,7 @@ class playGame extends Phaser.Scene {
     //stop coin for being collected twice, as it will stick around on the screen as it animnates
     gameObject.disableBody(false, false);
     if (gameObject.type == 'Coin') {
-      this.player.coinCount++
+      playerData.coinCount++
       this.updateCoin()
     }
     if (gameObject.type == 'pellet') {
@@ -1285,11 +1285,18 @@ class playGame extends Phaser.Scene {
     for (var i = 0; i < this.thinglayer.length; i++) {
       if (this.thinglayer[i].name == 'Coin') {
         //console.log(this.thinglayer[i])
+        var frame = Phaser.Math.Between(0, 15)
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
-        var coin = coins.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), rooms[currentRoom].tileKey, coinFrame)//99
+        var coin = coins.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'artifacts', frame)//99
         coin.type = this.thinglayer[i].name
         coin.setOrigin(.5, .5);
-        coin.anims.play('rotate')
+        coin.kind = frame
+        coin.tween = this.tweens.add({
+          targets: coin,
+          aplpha: .2,
+          yoyo: true,
+          duration: 500
+        })
       }
     }
 
@@ -1817,6 +1824,9 @@ class playGame extends Phaser.Scene {
   }
   addScore(amount) {
     this.events.emit('score', amount);
+  }
+  updateMissle() {
+    this.events.emit('misslecount');
   }
   addMissle() {
     this.events.emit('missle');
