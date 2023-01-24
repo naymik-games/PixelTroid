@@ -36,20 +36,19 @@ class UI extends Phaser.Scene {
     this.messageText = this.add.text(25, 65, 'Acquired Power Suit', { fontFamily: 'PixelFont', fontSize: '40px', color: '#fafafa', align: 'left' }).setOrigin(0)//C6EFD8
 
     //this.tankIcon = this.add.image(225, 45, 'tankUI', 1).setScale(1)
-
+    this.controlsY = game.config.height - 75
     this.setTanks()
-    this.missleIcon = this.add.image(game.config.width - 150, 45, 'missle_icons', 0).setScale(2).setAlpha(0)
-    this.missleCountText = this.add.text(game.config.width - 150, 75, '0', { fontFamily: 'PixelFont', fontSize: '40px', color: '#C6EFD8', align: 'left' }).setOrigin(.5).setAlpha(0)
+    this.setMissles()
 
 
-    this.coinIcon = this.add.image(game.config.width - 48, 45, 'coin', 0).setScale(2)
+    this.coinIcon = this.add.image(game.config.width - 48, 45, 'artifacts', 0).setScale(2)
     this.coinCountText = this.add.text(game.config.width - 74, 35, playerData.coinCount, { fontFamily: 'PixelFont', fontSize: '50px', color: '#C6EFD8', align: 'left' }).setOrigin(1, .5)
 
     this.keyIcon = this.add.image(game.config.width - 48, 100, rooms[currentRoom].tileKey, keyFrame).setScale(3).setAlpha(0)
     this.Main = this.scene.get('playGame');
     //this.score = 0;
     // this.scoreText = this.add.bitmapText(85, 100, 'topaz', this.score, 80).setOrigin(.5).setTint(0xcbf7ff).setAlpha(1);
-    this.controlsY = game.config.height - 75
+
     /*   var base = this.add.image(0, 0, 'controller_buttons', 0).setScale(2)
       var thumb = this.add.image(0, 0, 'controller_buttons', 1).setScale(2)
       this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
@@ -189,7 +188,8 @@ class UI extends Phaser.Scene {
 
 
     }, this);
-    this.Main.events.on('coin', function () {
+    this.Main.events.on('coin', function (kind) {
+      this.coinIcon.setFrame(kind)
       this.coinCountText.setText(playerData.coinCount)
 
     }, this);
@@ -236,6 +236,17 @@ class UI extends Phaser.Scene {
       let tankIcon2 = this.add.image(215 + 2 * 20, 25, 'tankUI', 0).setScale(1).setOrigin(.5, 0)
       let tankIconTest = this.add.image(215, 45, 'tankUI', 0).setScale(1).setOrigin(.5, 0) */
 
+  }
+  setMissles() {
+    this.missleIcon = this.add.image(game.config.width - 150, 45, 'missle_icons', 0).setScale(2).setAlpha(0)
+    this.missleCountText = this.add.text(game.config.width - 150, 75, '0', { fontFamily: 'PixelFont', fontSize: '40px', color: '#C6EFD8', align: 'left' }).setOrigin(.5).setAlpha(0)
+    if (playerData.hasMissle) {
+      this.missleIcon.setAlpha(1)
+      this.missleCountText.setAlpha(1)
+      this.updateCapacityText()
+      this.sButton = this.add.image(game.config.width - 525, this.controlsY + 25, "controller_buttons", 12).setScale(6).setInteractive();
+      this.sButton.on('pointerdown', this.doS, this);
+    }
   }
   setTanks() {
     var counter = 0

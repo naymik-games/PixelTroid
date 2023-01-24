@@ -1,115 +1,30 @@
+
+
+
 class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene, x, y, kind) {
 
     super(scene, x, y, enemeyConfigs[kind].key);
     this.scene = scene
-    const anims = scene.anims;
-
     this.kind = kind
-    this.launched = false
-    //this.play('thrust');
-    var tiles = Phaser.Math.Between(3, 6)
-    this.vx = Phaser.Math.Between(10, 35)
-    var maxDistance = (tiles * scene.map.tileWidth) + scene.map.tileWidth / 2;
-    //  You can either do this:
     scene.add.existing(this);
     scene.physics.add.existing(this);
     enemies.add(this)
     this.setOrigin(.5, .5);
     this.setCollideWorldBounds(true);
     this.setBounce(0)
-    if (this.kind == 1 || this.kind == 3 || this.kind == 8) {
-      this.body.setAllowGravity(false)
-    }
-    this.previousX = this.x;
-    this.strength = enemeyConfigs[kind].strength
-    this.damage = enemeyConfigs[kind].damage
-    this.frozen = false
-    this.maxDistance = maxDistance
-    this.saveXYV = { x: 0, y: 0 }
-    this.anims.create({
-      key: 'enemy-run',
-      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 2 }),
-      frameRate: enemeyConfigs[kind].fr,
-      repeat: -1
-    })
-    this.play('enemy-run')
-    if (this.kind == 0 || this.kind == 1) {
-      if (Phaser.Math.Between(1, 2) > 1) {
-        this.body.velocity.x = -this.vx;
-        this.direction = -1;
-        this.setFlipX(true)
-      } else {
-        this.body.velocity.x = this.vx;
-        this.direction = 1;
-        this.setFlipX(false)
-      }
-    }
 
 
   }
-  preUpdate(time, delta) {
-    super.preUpdate(time, delta);
-    if (this.frozen) {
-      this.scene.physics.add.collider(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
-    } else {
-      this.scene.physics.add.overlap(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
-    }
-    if (this.kind == 0) {
-      if (Math.abs(this.x - this.previousX) >= this.maxDistance) {
-        this.toggleFlipX()
-        this.body.velocity.y = -200
-        this.switchDirection();
-      } else {
-        if (this.direction == -1 && this.body.blocked.left) {
-          // console.log('blocked left')
-          this.setFlipX(false)
-          this.body.velocity.x = this.vx;
-          this.direction = 1
-          this.previousX = this.x;
-          //this.switchDirection();
-        }
-        if (this.direction == 1 && this.body.blocked.right) {
-          //console.log('blocked right')
-          this.setFlipX(true)
-          this.body.velocity.x = -this.vx;
-          this.direction = -1
-          this.previousX = this.x;
-          //this.switchDirection();
-        }
-      }
-    } else if (this.kind == 1) {
-      if (this.direction == -1 && this.body.blocked.left) {
-        // console.log('blocked left')
-        this.setFlipX(false)
-        this.body.velocity.x = this.vx;
-        this.direction = 1
-        this.previousX = this.x;
-        //this.switchDirection();
-      }
-      if (this.direction == 1 && this.body.blocked.right) {
-        //console.log('blocked right')
-        this.setFlipX(true)
-        this.body.velocity.x = -this.vx;
-        this.direction = -1
-        this.previousX = this.x;
-        //this.switchDirection();
-      }
-    }
-    if (this.kind == 8) {
-      // this.enemyFollows()
-      if (Math.abs(this.x - this.scene.player.sprite.x) < this.maxDistance) {
-        this.enemyFollowsOnce()
-      }
-    }
-    if (this.kind == 3) {
-      // this.enemyFollows()
-      if (Math.abs(this.x - this.scene.player.sprite.x) < this.maxDistance) {
-        this.enemyFollowsContinuous()
-      }
-    }
 
+  switchDirection() {
+
+    //reverse velocity so baddie moves are same speed but in opposite direction
+    this.body.velocity.x *= -1;
+    this.direction *= -1
+    //reset count
+    this.previousX = this.x;
   }
   enemyFollowsOnce() {
     if (!this.launched) {
@@ -118,17 +33,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.scene.physics.moveToObject(this, this.scene.player.sprite, 50);
     }
 
-  }
-  enemyFollowsContinuous() {
-    this.scene.physics.moveToObject(this, this.scene.player.sprite, 15);
-  }
-  switchDirection() {
-
-    //reverse velocity so baddie moves are same speed but in opposite direction
-    this.body.velocity.x *= -1;
-    this.direction *= -1
-    //reset count
-    this.previousX = this.x;
   }
   enemyHit(damage) {
     this.strength -= damage
@@ -183,6 +87,193 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
   }
 }
+/////////////////////////////////////////////////////////////////////////////////////
+// Enemy 1
+////////////////////////////////////////////////////////////////////////////////////
+class Enemy01 extends Enemy {
+  constructor(scene, x, y, kind) {
+    super(scene, x, y, kind);
+
+    const anims = scene.anims;
+
+
+    this.launched = false
+    //this.play('thrust');
+    var tiles = Phaser.Math.Between(3, 6)
+    this.vx = Phaser.Math.Between(10, 35)
+    var maxDistance = (tiles * scene.map.tileWidth) + scene.map.tileWidth / 2;
+    //  You can either do this:
+
+
+    this.previousX = this.x;
+    this.strength = enemeyConfigs[kind].strength
+    this.damage = enemeyConfigs[kind].damage
+    this.frozen = false
+    this.maxDistance = maxDistance
+    this.saveXYV = { x: 0, y: 0 }
+    this.anims.create({
+      key: 'enemy-run',
+      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 2 }),
+      frameRate: enemeyConfigs[kind].fr,
+      repeat: -1
+    })
+    this.play('enemy-run')
+
+    this.body.velocity.x = -this.vx;
+    this.direction = -1;
+    this.setFlipX(true)
+
+
+  }
+  preUpdate(time, delta) {
+    super.preUpdate(time, delta);
+    if (this.frozen) {
+      this.scene.physics.add.collider(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    } else {
+      this.scene.physics.add.overlap(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    }
+
+    if (Math.abs(this.x - this.previousX) >= this.maxDistance) {
+      this.toggleFlipX()
+      this.body.velocity.y = -200
+      this.switchDirection();
+    } else {
+      if (this.direction == -1 && this.body.blocked.left) {
+        // console.log('blocked left')
+        this.setFlipX(false)
+        this.body.velocity.x = this.vx;
+        this.direction = 1
+        this.previousX = this.x;
+        //this.switchDirection();
+      }
+      if (this.direction == 1 && this.body.blocked.right) {
+        //console.log('blocked right')
+        this.setFlipX(true)
+        this.body.velocity.x = -this.vx;
+        this.direction = -1
+        this.previousX = this.x;
+        //this.switchDirection();
+      }
+    }
+
+  }
+
+}
+/////////////////////////////////////////////////////////////////////////////////////
+// Enemy 2
+////////////////////////////////////////////////////////////////////////////////////
+class Enemy02 extends Enemy {
+  constructor(scene, x, y, kind) {
+    super(scene, x, y, kind);
+
+    const anims = scene.anims;
+
+
+    this.launched = false
+    //this.play('thrust');
+    var tiles = Phaser.Math.Between(3, 6)
+    this.vx = Phaser.Math.Between(10, 35)
+    var maxDistance = (tiles * scene.map.tileWidth) + scene.map.tileWidth / 2;
+    //  You can either do this:
+    this.body.setAllowGravity(false)
+
+    this.previousX = this.x;
+    this.strength = enemeyConfigs[kind].strength
+    this.damage = enemeyConfigs[kind].damage
+    this.frozen = false
+    this.maxDistance = maxDistance
+    this.saveXYV = { x: 0, y: 0 }
+    this.anims.create({
+      key: 'enemy-run',
+      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 2 }),
+      frameRate: enemeyConfigs[kind].fr,
+      repeat: -1
+    })
+    this.play('enemy-run')
+
+    this.body.velocity.x = -this.vx;
+    this.direction = -1;
+    this.setFlipX(true)
+
+
+  }
+  preUpdate(time, delta) {
+    super.preUpdate(time, delta);
+    if (this.frozen) {
+      this.scene.physics.add.collider(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    } else {
+      this.scene.physics.add.overlap(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    }
+    if (this.direction == -1 && this.body.blocked.left) {
+      // console.log('blocked left')
+      this.setFlipX(false)
+      this.body.velocity.x = this.vx;
+      this.direction = 1
+      this.previousX = this.x;
+      //this.switchDirection();
+    }
+    if (this.direction == 1 && this.body.blocked.right) {
+      //console.log('blocked right')
+      this.setFlipX(true)
+      this.body.velocity.x = -this.vx;
+      this.direction = -1
+      this.previousX = this.x;
+      //this.switchDirection();
+    }
+
+
+  }
+
+}
+/////////////////////////////////////////////////////////////////////////////////////
+// Enemy 9
+////////////////////////////////////////////////////////////////////////////////////
+class Enemy09 extends Enemy {
+  constructor(scene, x, y, kind) {
+    super(scene, x, y, kind);
+
+    const anims = scene.anims;
+
+
+    this.launched = false
+    //this.play('thrust');
+    var tiles = Phaser.Math.Between(3, 6)
+    this.vx = Phaser.Math.Between(10, 35)
+    var maxDistance = (tiles * scene.map.tileWidth) + scene.map.tileWidth / 2;
+    //  You can either do this:
+    this.body.setAllowGravity(false)
+
+    this.previousX = this.x;
+    this.strength = enemeyConfigs[kind].strength
+    this.damage = enemeyConfigs[kind].damage
+    this.frozen = false
+    this.maxDistance = maxDistance
+    this.saveXYV = { x: 0, y: 0 }
+    this.anims.create({
+      key: 'enemy-run',
+      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 2 }),
+      frameRate: enemeyConfigs[kind].fr,
+      repeat: -1
+    })
+    this.play('enemy-run')
+
+  }
+  preUpdate(time, delta) {
+    super.preUpdate(time, delta);
+    if (this.frozen) {
+      this.scene.physics.add.collider(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    } else {
+      this.scene.physics.add.overlap(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    }
+    if (Math.abs(this.x - this.scene.player.sprite.x) < this.maxDistance) {
+      this.enemyFollowsOnce()
+    }
+
+
+  }
+
+}
+////////////////////////////////////////////////////////////////////////////////
 
 const enemeyConfigs = [{
   //enemy 1 walks side to side

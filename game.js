@@ -740,7 +740,7 @@ class playGame extends Phaser.Scene {
     gameObject.disableBody(false, false);
     if (gameObject.type == 'Coin') {
       playerData.coinCount++
-      this.updateCoin()
+      this.updateCoin(gameObject.kind)
     }
     if (gameObject.type == 'pellet') {
       //playerData.health += gameObject.amount
@@ -1285,7 +1285,7 @@ class playGame extends Phaser.Scene {
     for (var i = 0; i < this.thinglayer.length; i++) {
       if (this.thinglayer[i].name == 'Coin') {
         //console.log(this.thinglayer[i])
-        var frame = Phaser.Math.Between(0, 15)
+        var frame = Phaser.Math.Between(0, 95)
         var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
         var coin = coins.create(worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 'artifacts', frame)//99
         coin.type = this.thinglayer[i].name
@@ -1293,13 +1293,23 @@ class playGame extends Phaser.Scene {
         coin.kind = frame
         coin.tween = this.tweens.add({
           targets: coin,
-          aplpha: .2,
+          // aplpha: .2,
+          scale: .7,
           yoyo: true,
-          duration: 500
+          duration: 1000,
+          repeat: -1
         })
       }
     }
-
+    Phaser.Actions.Call(coins.getChildren(), child => {
+      this.tweens.add({
+        targets: child,
+        aplpha: .2,
+        scale: .7,
+        yoyo: true,
+        duration: 1000
+      })
+    }, this);
   }
   createTanks() {
     //tanks = this.physics.add.group({ allowGravity: false });
@@ -1520,19 +1530,19 @@ class playGame extends Phaser.Scene {
     for (var i = 0; i < this.thinglayer.length; i++) {
       var worldXY = this.map.tileToWorldXY(this.thinglayer[i].x, this.thinglayer[i].y + 1)
       if (this.thinglayer[i].name == 'Enemy1') {
-        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 0)
+        var enemey = new Enemy01(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 0)
         //console.log('make enemy 1')
       } else if (this.thinglayer[i].name == 'Enemy2') {
-        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 1)
+        var enemey = new Enemy02(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 1)
         // console.log('make enemy 2')
       }
       else if (this.thinglayer[i].name == 'Enemy9') {
-        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 8)
+        var enemey = new Enemy09(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 8)
         // console.log('make enemy 2')
-      } else if (this.thinglayer[i].name == 'Enemy4') {
-        var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 3)
-        // console.log('make enemy 2')
-      }
+      } /*else if (this.thinglayer[i].name == 'Enemy4') {
+         var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 3)
+         // console.log('make enemy 2')
+       } */
     }
     //console.log(enemies)
   }
@@ -1846,8 +1856,8 @@ class playGame extends Phaser.Scene {
   sendMessage(item) {
     this.events.emit('message', item);
   }
-  updateCoin() {
-    this.events.emit('coin');
+  updateCoin(kind) {
+    this.events.emit('coin', kind);
   }
   updateKey() {
     this.events.emit('key');
