@@ -1,4 +1,6 @@
-
+///////////////////////////////////////////////////////////////////////////
+// BASE ENEMY CLASS
+///////////////////////////////////////////////////////////////////////////
 
 
 class Enemy extends Phaser.Physics.Arcade.Sprite {
@@ -33,6 +35,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.scene.physics.moveToObject(this, this.scene.player.sprite, 50);
     }
 
+  }
+  enemyFollowsContinuous() {
+    this.scene.physics.moveToObject(this, this.scene.player.sprite, 15);
   }
   enemyHit(damage) {
     this.strength -= damage
@@ -113,7 +118,7 @@ class Enemy01 extends Enemy {
     this.saveXYV = { x: 0, y: 0 }
     this.anims.create({
       key: 'enemy-run',
-      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 2 }),
+      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 3 }),
       frameRate: enemeyConfigs[kind].fr,
       repeat: -1
     })
@@ -226,9 +231,9 @@ class Enemy02 extends Enemy {
 
 }
 /////////////////////////////////////////////////////////////////////////////////////
-// Enemy 9
+// Enemy 3
 ////////////////////////////////////////////////////////////////////////////////////
-class Enemy09 extends Enemy {
+class Enemy03 extends Enemy {
   constructor(scene, x, y, kind) {
     super(scene, x, y, kind);
 
@@ -241,6 +246,78 @@ class Enemy09 extends Enemy {
     this.vx = Phaser.Math.Between(10, 35)
     var maxDistance = (tiles * scene.map.tileWidth) + scene.map.tileWidth / 2;
     //  You can either do this:
+
+
+    this.previousX = this.x;
+    this.strength = enemeyConfigs[kind].strength
+    this.damage = enemeyConfigs[kind].damage
+    this.frozen = false
+    this.maxDistance = maxDistance
+    this.saveXYV = { x: 0, y: 0 }
+    this.anims.create({
+      key: 'enemy-run',
+      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 1 }),
+      frameRate: enemeyConfigs[kind].fr,
+      repeat: -1
+    })
+    this.play('enemy-run')
+
+    this.body.velocity.x = -this.vx;
+    this.direction = -1;
+    this.setFlipX(true)
+
+
+  }
+  preUpdate(time, delta) {
+    super.preUpdate(time, delta);
+    if (this.frozen) {
+      this.scene.physics.add.collider(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    } else {
+      this.scene.physics.add.overlap(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    }
+
+    if (Math.abs(this.x - this.previousX) >= this.maxDistance) {
+      this.toggleFlipX()
+      // this.body.velocity.y = -200
+      this.switchDirection();
+    } else {
+      if (this.direction == -1 && this.body.blocked.left) {
+        // console.log('blocked left')
+        this.setFlipX(false)
+        this.body.velocity.x = this.vx;
+        this.direction = 1
+        this.previousX = this.x;
+        //this.switchDirection();
+      }
+      if (this.direction == 1 && this.body.blocked.right) {
+        //console.log('blocked right')
+        this.setFlipX(true)
+        this.body.velocity.x = -this.vx;
+        this.direction = -1
+        this.previousX = this.x;
+        //this.switchDirection();
+      }
+    }
+
+  }
+
+}
+/////////////////////////////////////////////////////////////////////////////////////
+// Enemy 4
+////////////////////////////////////////////////////////////////////////////////////
+class Enemy04 extends Enemy {
+  constructor(scene, x, y, kind) {
+    super(scene, x, y, kind);
+
+    const anims = scene.anims;
+
+
+    this.launched = false
+    //this.play('thrust');
+    var tiles = Phaser.Math.Between(3, 6)
+    this.vx = Phaser.Math.Between(10, 25)
+    var maxDistance = (tiles * scene.map.tileWidth) + scene.map.tileWidth / 2;
+    //  You can either do this:
     this.body.setAllowGravity(false)
 
     this.previousX = this.x;
@@ -251,7 +328,55 @@ class Enemy09 extends Enemy {
     this.saveXYV = { x: 0, y: 0 }
     this.anims.create({
       key: 'enemy-run',
-      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 2 }),
+      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 3 }),
+      frameRate: enemeyConfigs[kind].fr,
+      repeat: -1
+    })
+    this.play('enemy-run')
+
+  }
+  preUpdate(time, delta) {
+    super.preUpdate(time, delta);
+    if (this.frozen) {
+      this.scene.physics.add.collider(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    } else {
+      this.scene.physics.add.overlap(this.scene.player.sprite, this, this.scene.hitEnemy, null, this.scene);
+    }
+    if (Math.abs(this.x - this.scene.player.sprite.x) < this.maxDistance) {
+      this.enemyFollowsContinuous()
+    }
+
+
+  }
+
+}
+/////////////////////////////////////////////////////////////////////////////////////
+// Enemy 9
+////////////////////////////////////////////////////////////////////////////////////
+class Enemy09 extends Enemy {
+  constructor(scene, x, y, kind) {
+    super(scene, x, y, kind);
+
+    const anims = scene.anims;
+
+
+    this.launched = false
+    //this.play('thrust');
+    var tiles = Phaser.Math.Between(3, 6)
+    this.vx = Phaser.Math.Between(10, 25)
+    var maxDistance = (tiles * scene.map.tileWidth) + scene.map.tileWidth / 2;
+    //  You can either do this:
+    this.body.setAllowGravity(false)
+
+    this.previousX = this.x;
+    this.strength = enemeyConfigs[kind].strength
+    this.damage = enemeyConfigs[kind].damage
+    this.frozen = false
+    this.maxDistance = maxDistance
+    this.saveXYV = { x: 0, y: 0 }
+    this.anims.create({
+      key: 'enemy-run',
+      frames: anims.generateFrameNumbers(enemeyConfigs[kind].key, { start: 0, end: 1 }),
       frameRate: enemeyConfigs[kind].fr,
       repeat: -1
     })
@@ -276,7 +401,7 @@ class Enemy09 extends Enemy {
 ////////////////////////////////////////////////////////////////////////////////
 
 const enemeyConfigs = [{
-  //enemy 1 walks side to side
+  //enemy 1 walks side to side jump on direction change
   strength: 4,
   key: 'enemy01',
   fr: 12,
@@ -286,12 +411,13 @@ const enemeyConfigs = [{
   //eneny 2 flies side to side
   strength: 4,
   key: 'enemy02',
-  fr: 3,
+  fr: 12,
   damage: 5
 },
 
 {
-  strength: 0,
+  //enemy 1 walks side to side no jump on direction change
+  strength: 4,
   key: 'enemy03',
   fr: 12,
   damage: 5
@@ -337,7 +463,7 @@ const enemeyConfigs = [{
   //Enemy9 flies down to ground towards payer when near
   strength: 6,
   key: 'enemy09',
-  fr: 12,
+  fr: 8,
   damage: 7
 }
 ]

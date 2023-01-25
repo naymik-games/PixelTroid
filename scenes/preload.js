@@ -92,36 +92,25 @@ class preloadGame extends Phaser.Scene {
       frameWidth: 100,
       frameHeight: 100
     });
-    this.load.spritesheet("area1_tiles", "assets/sprites/area1_tiles.png", {
+    this.load.spritesheet("area1_tiles", "assets/sprites/tiles/area1_tiles.png", {
       frameWidth: 16,
       frameHeight: 16,
       margin: 1,
       spacing: 1
     });
-    this.load.spritesheet("metroid_tiles", "assets/sprites/metroid_tiles.png", {
+    this.load.spritesheet("metroid_tiles", "assets/sprites/tiles/metroid_tiles.png", {
       frameWidth: 16,
       frameHeight: 16,
       margin: 1,
       spacing: 1
     });
-    this.load.spritesheet("surface_tiles", "assets/sprites/surface_tiles.png", {
+    this.load.spritesheet("surface_tiles", "assets/sprites/tiles/surface_tiles.png", {
       frameWidth: 16,
       frameHeight: 16,
       margin: 1,
       spacing: 1
     });
-    this.load.spritesheet("tiles_", "assets/sprites/nokia_tiles_dark.png", {
-      frameWidth: 16,
-      frameHeight: 16,
-      margin: 1,
-      spacing: 1
-    });
-    this.load.spritesheet("tiles___", "assets/sprites/nokia_tiles_grey.png", {
-      frameWidth: 16,
-      frameHeight: 16,
-      margin: 1,
-      spacing: 1
-    });
+
     this.load.spritesheet('coin', 'assets/sprites/nokia_coin.png', {
       frameWidth: 16,
       frameHeight: 16
@@ -179,7 +168,7 @@ class preloadGame extends Phaser.Scene {
     });
     this.load.spritesheet('enemy09', 'assets/sprites/enemies/enemy09.png', {
       frameWidth: 16,
-      frameHeight: 16
+      frameHeight: 24
     });
 
     this.load.spritesheet('powerups', 'assets/sprites/powerups.png', {

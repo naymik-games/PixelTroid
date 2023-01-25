@@ -1535,14 +1535,16 @@ class playGame extends Phaser.Scene {
       } else if (this.thinglayer[i].name == 'Enemy2') {
         var enemey = new Enemy02(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 1)
         // console.log('make enemy 2')
-      }
-      else if (this.thinglayer[i].name == 'Enemy9') {
-        var enemey = new Enemy09(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 8)
+      } else if (this.thinglayer[i].name == 'Enemy3') {
+        var enemey = new Enemy03(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 2)
         // console.log('make enemy 2')
-      } /*else if (this.thinglayer[i].name == 'Enemy4') {
-         var enemey = new Enemy(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 3)
-         // console.log('make enemy 2')
-       } */
+      } else if (this.thinglayer[i].name == 'Enemy4') {
+        var enemey = new Enemy04(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 2), 3)
+        // console.log('make enemy 2')
+      } else if (this.thinglayer[i].name == 'Enemy9') {
+        var enemey = new Enemy09(this, worldXY.x + (this.map.tileWidth / 2), worldXY.y - (this.map.tileHeight / 4), 8)
+        // console.log('make enemy 2')
+      }
     }
     //console.log(enemies)
   }
