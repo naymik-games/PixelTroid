@@ -20,7 +20,7 @@ window.onload = function () {
         debug: false
       }
     },
-    scene: [preloadGame, startGame, playGame, UI]
+    scene: [preloadGame, startGame, playGame, UI, mapScene]
   }
   game = new Phaser.Game(gameConfig);
   window.focus();

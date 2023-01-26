@@ -31,11 +31,16 @@ class UI extends Phaser.Scene {
     progressBar.clear()
     progressBar.fillStyle(0x00ff00, 1);
     progressBar.fillRect(55, 35, 140 * value, 15)
-    this.eText = this.add.text(25, 35, 'E', { fontFamily: 'PixelFont', fontSize: '50px', color: '#fafafa', align: 'left' }).setOrigin(.5)//C6EFD8
+    this.eText = this.add.text(25, 35, 'E', { fontFamily: 'PixelFont', fontSize: '50px', color: '#fafafa', align: 'left' }).setOrigin(.5).setInteractive()//C6EFD8
+    this.eText.on('pointerdown', function () {
 
+      this.scene.pause('playGame');
+      this.scene.pause('UI');
+      this.scene.start('mapScene');
+
+    }, this);
     this.messageText = this.add.text(25, 65, 'Acquired Power Suit', { fontFamily: 'PixelFont', fontSize: '40px', color: '#fafafa', align: 'left' }).setOrigin(0)//C6EFD8
 
-    //this.tankIcon = this.add.image(225, 45, 'tankUI', 1).setScale(1)
     this.controlsY = game.config.height - 75
     this.setTanks()
     this.setMissles()

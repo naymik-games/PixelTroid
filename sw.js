@@ -1,4 +1,4 @@
-var cacheName = 'PixelDots v1.00';
+var cacheName = 'PixelDots v1.01';
 var filesToCache = [
   '/',
   '/index.html',
